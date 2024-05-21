@@ -1,0 +1,97 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                 String     @id @default(uuid())
+  name               String
+  email              String     @unique
+  password           String
+  needPasswordChange Boolean    @default(true)
+  role               UserRole    @default(USER)
+  bloodType          BloodGroup 
+  location           String
+  city               String?
+  availability       Boolean    @default(true)
+  status             UserStatus @default(ACTIVE)
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+  userProfile        UserProfile?
+  donor    Request[]    @relation("DonatedRequests")
+  // requester  Request[]    @relation("RequestedRequests")
+
+  @@map("users")
+}
+
+model Request {
+  id                 String     @id @default(uuid())
+  donorId            String
+  requesterId        String?
+  phoneNumber        String
+  dateOfDonation     String
+  hospitalName       String
+  hospitalAddress    String
+  reason             String
+  requestStatus      RequestStatus @default(PENDING)
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+
+  donor              User          @relation("DonatedRequests", fields: [donorId], references: [id])
+  // requester          User          @relation("RequestedRequests", fields: [requesterId], references: [id])
+
+  @@map("requests")
+}
+
+model UserProfile {
+  id                 String     @id @default(uuid())
+  userId             String     @unique
+  bio                String     
+  age                Int
+  lastDonationDate   String    
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("userprofiles")
+}
+
+
+enum UserStatus {
+  ACTIVE
+  BLOCKED
+  DELETED
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+  USER
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum BloodGroup { 
+  A_POSITIVE
+  A_NEGATIVE
+  B_POSITIVE
+  B_NEGATIVE
+  AB_POSITIVE
+  AB_NEGATIVE
+  O_POSITIVE
+  O_NEGATIVE
+}
