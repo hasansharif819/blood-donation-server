@@ -6,6 +6,8 @@ import validateRequest from "../../middlewares/validateRequest";
 const router = express.Router();
 
 router.get("/donor-list", userController.getAllFromDB);
+router.get("/donor-list/:id", userController.getByIdFromDB);
+
 router.post(
   "/register",
   validateRequest(userValidation.createUser),

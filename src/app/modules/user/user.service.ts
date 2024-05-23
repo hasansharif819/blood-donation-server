@@ -2,7 +2,7 @@ import * as bcrypt from "bcrypt";
 import prisma from "../../../shared/prisma";
 import { IPaginationOptions } from "../../interfaces/pagination";
 import { paginationHelper } from "../../../helpars/paginationHelper";
-import { Prisma } from "@prisma/client";
+import { Prisma, User, UserStatus } from "@prisma/client";
 import { userSearchAbleFields } from "./user.constant";
 import ApiError from "../../errors/ApiError";
 import httpStatus from "http-status";
@@ -89,6 +89,32 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
   };
 };
 
+//get by id
+const getByIdFromDB = async (id: string): Promise<User | null> => {
+  // console.log(id);
+  const result = await prisma.user.findUnique({
+    where: {
+      id,
+      status: UserStatus.ACTIVE,
+    },
+    include: {
+      userProfile: {
+        select: {
+          id: true,
+          userId: true,
+          bio: true,
+          age: true,
+          lastDonationDate: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      },
+    },
+  });
+  // console.log(result);
+  return result;
+};
+
 //Create user
 const createUser = async (data: any) => {
   const hashedPassword = await bcrypt.hash(data.password, 12);
@@ -156,5 +182,6 @@ const createUser = async (data: any) => {
 
 export const userServices = {
   getAllFromDB,
+  getByIdFromDB,
   createUser,
 };

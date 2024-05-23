@@ -22,6 +22,17 @@ const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getByIdFromDB = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await userServices.getByIdFromDB(id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Donor retrieval successfully",
+    data: result,
+  });
+});
+
 const createUser = catchAsync(async (req: Request, res: Response) => {
   const result = await userServices.createUser(req.body);
   sendResponse(res, {
@@ -35,5 +46,6 @@ const createUser = catchAsync(async (req: Request, res: Response) => {
 
 export const userController = {
   getAllFromDB,
+  getByIdFromDB,
   createUser,
 };
