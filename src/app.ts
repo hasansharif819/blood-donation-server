@@ -10,7 +10,15 @@ import { requestRoutes } from "./app/modules/request/request.routes";
 import { profileRoutes } from "./app/modules/profile/profile.routes";
 
 const app: Application = express();
-app.use(cors());
+
+app.use(
+  cors({
+    origin: ["http://localhost:3000", "http://localhost:3001"],
+    credentials: true,
+  })
+);
+
+// app.use(cors());
 app.use(cookieParser());
 
 //parser
