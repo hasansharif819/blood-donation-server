@@ -7,9 +7,14 @@ import httpStatus from "http-status";
 const loginUser = catchAsync(async (req: Request, res: Response) => {
   const result = await AuthServices.loginUser(req.body);
 
-  const { refreshToken } = result;
+  const { refreshToken, accessToken } = result;
 
   res.cookie("refreshToken", refreshToken, {
+    secure: false,
+    httpOnly: true,
+  });
+
+  res.cookie("accessToken", accessToken, {
     secure: false,
     httpOnly: true,
   });
