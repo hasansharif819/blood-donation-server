@@ -59,6 +59,9 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
       location: true,
       availability: true,
       status: true,
+      profilePicture: true,
+      totalDonations: true,
+      city: true,
       createdAt: true,
       updatedAt: true,
       userProfile: {
@@ -67,6 +70,7 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
           userId: true,
           bio: true,
           age: true,
+          contactNumber: true,
           lastDonationDate: true,
           createdAt: true,
           updatedAt: true,
