@@ -16,10 +16,4 @@ router.post(
   userController.createUser
 );
 
-router.post(
-  "/update-profile-picture",
-  auth(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.USER),
-  userController.updateUserProfilePicture
-);
-
 export const userRoutes = router;

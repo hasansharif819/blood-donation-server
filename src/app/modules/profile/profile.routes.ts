@@ -19,4 +19,11 @@ router.put(
   validateRequest(userValidation.updateUser),
   profileController.updateProfile
 );
+
+router.post(
+  "/update-profile-picture",
+  auth(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.USER),
+  profileController.updateUserProfilePicture
+);
+
 export const profileRoutes = router;

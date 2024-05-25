@@ -14,6 +14,10 @@ const myProfile = async (user: any) => {
       email: true,
       bloodType: true,
       location: true,
+      city: true,
+      profilePicture: true,
+      totalDonations: true,
+      status: true,
       availability: true,
       createdAt: true,
       updatedAt: true,
@@ -98,6 +102,7 @@ const updateProfile = async (user: any, data: any) => {
   const userProfileData = {
     bio: data.bio,
     age: data.age,
+    contactNumber: data.contactNumber,
     lastDonationDate: data.lastDonationDate,
   };
 
@@ -143,6 +148,7 @@ const updateProfile = async (user: any, data: any) => {
       userProfile: {
         bio: updatedUserProfile.bio,
         age: updatedUserProfile.age,
+        contactNumber: updatedUserProfile.contactNumber,
         lastDonationDate: updatedUserProfile.lastDonationDate,
         createdAt: updatedUserProfile.createdAt,
         updatedAt: updatedUserProfile.updatedAt,
@@ -151,7 +157,38 @@ const updateProfile = async (user: any, data: any) => {
   };
 };
 
+// update user profile picture
+const updateUserProfilePicture = async (data: any) => {
+  // console.log("Profile picture = ", data);
+  const result = await prisma.user.update({
+    where: {
+      id: data.id,
+    },
+    data: {
+      profilePicture: data.profilePicture,
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      needPasswordChange: true,
+      role: true,
+      bloodType: true,
+      location: true,
+      city: true,
+      profilePicture: true,
+      totalDonations: true,
+      availability: true,
+      status: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+  return result;
+};
+
 export const profileServices = {
   myProfile,
   updateProfile,
+  updateUserProfilePicture,
 };

@@ -60,6 +60,7 @@ model UserProfile {
   userId             String     @unique
   bio                String     
   age                Int
+  contactNumber      String?
   lastDonationDate   String    
   createdAt          DateTime   @default(now())
   updatedAt          DateTime   @updatedAt

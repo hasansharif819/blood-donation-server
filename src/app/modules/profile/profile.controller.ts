@@ -26,7 +26,21 @@ const updateProfile = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const updateUserProfilePicture = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await profileServices.updateUserProfilePicture(req.body);
+    sendResponse(res, {
+      // statusCode: httpStatus.OK,
+      success: true,
+      statusCode: 201,
+      message: "Profile picture successfully updated!",
+      data: result,
+    });
+  }
+);
+
 export const profileController = {
   myProfile,
   updateProfile,
+  updateUserProfilePicture,
 };
