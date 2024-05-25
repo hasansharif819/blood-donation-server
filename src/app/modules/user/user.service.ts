@@ -128,6 +128,8 @@ const createUser = async (data: any) => {
     role: data.role || "USER",
     bloodType: data.bloodType,
     location: data.location,
+    city: data.city,
+    totalDonations: data.totalDonations,
     availability: data.availability,
     status: data.status,
   };
@@ -180,8 +182,39 @@ const createUser = async (data: any) => {
   return result;
 };
 
+// update user profile picture
+const updateUserProfilePicture = async (data: any) => {
+  // console.log("Profile picture = ", data);
+  const result = await prisma.user.update({
+    where: {
+      id: data.id,
+    },
+    data: {
+      profilePicture: data.profilePicture,
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      needPasswordChange: true,
+      role: true,
+      bloodType: true,
+      location: true,
+      city: true,
+      profilePicture: true,
+      totalDonations: true,
+      availability: true,
+      status: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+  return result;
+};
+
 export const userServices = {
   getAllFromDB,
   getByIdFromDB,
   createUser,
+  updateUserProfilePicture,
 };

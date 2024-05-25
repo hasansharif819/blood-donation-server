@@ -23,6 +23,8 @@ model User {
   bloodType          BloodGroup 
   location           String
   city               String?
+  profilePicture     String?
+  totalDonations     Int @default(0)
   availability       Boolean    @default(true)
   status             UserStatus @default(ACTIVE)
   createdAt          DateTime   @default(now())

@@ -44,8 +44,22 @@ const createUser = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const updateUserProfilePicture = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await userServices.updateUserProfilePicture(req.body);
+    sendResponse(res, {
+      // statusCode: httpStatus.OK,
+      success: true,
+      statusCode: 201,
+      message: "Profile picture successfully updated!",
+      data: result,
+    });
+  }
+);
+
 export const userController = {
   getAllFromDB,
   getByIdFromDB,
   createUser,
+  updateUserProfilePicture,
 };
