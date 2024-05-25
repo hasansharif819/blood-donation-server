@@ -14,7 +14,7 @@ router.get(
 );
 
 router.put(
-  "/my-profile",
+  "/update-my-profile",
   auth(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.USER),
   validateRequest(userValidation.updateUser),
   profileController.updateProfile
