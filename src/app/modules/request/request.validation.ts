@@ -1,4 +1,4 @@
-import { RequestStatus } from "@prisma/client";
+import { BloodGroup, RequestStatus } from "@prisma/client";
 import { z } from "zod";
 
 const createRequest = z.object({
@@ -10,6 +10,16 @@ const createRequest = z.object({
     phoneNumber: z.string({
       required_error: "Phone number is required!",
     }),
+    bloodType: z.enum([
+      BloodGroup.AB_NEGATIVE,
+      BloodGroup.AB_POSITIVE,
+      BloodGroup.A_NEGATIVE,
+      BloodGroup.A_POSITIVE,
+      BloodGroup.B_NEGATIVE,
+      BloodGroup.B_POSITIVE,
+      BloodGroup.O_NEGATIVE,
+      BloodGroup.O_POSITIVE,
+    ]),
     dateOfDonation: z.string({
       required_error: "Date of Donation is required!",
     }),

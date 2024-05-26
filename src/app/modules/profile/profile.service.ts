@@ -3,6 +3,8 @@ import prisma from "../../../shared/prisma";
 
 //My Profile
 const myProfile = async (user: any) => {
+  // const id = user.userId;
+  // console.log("user Id =", id);
   const userEmail = user.email;
   const getMe = await prisma.user.findUnique({
     where: {
@@ -26,38 +28,6 @@ const myProfile = async (user: any) => {
   });
   return getMe;
 };
-
-//Update My Profile
-// const updateProfile = async (user: any, data: any) => {
-//   // console.log("User = ", user);
-//   // const userEmail = user.email;
-
-//   // email: userEmail,
-//   const userId = user.userId;
-//   console.log("User id = ", userId);
-
-//   const profile = await prisma.user.findFirst({
-//     where: {
-//       id: userId,
-//     },
-//   });
-
-//   console.log("profile = ", profile);
-
-//   if (!profile) {
-//     return httpStatus.NOT_FOUND;
-//   }
-
-//   const meId = profile.id;
-
-//   const updateMe = await prisma.userProfile.update({
-//     where: {
-//       userId: meId,
-//     },
-//     data,
-//   });
-//   return updateMe;
-// };
 
 //partial updating the user profile
 const updateProfile = async (user: any, data: any) => {

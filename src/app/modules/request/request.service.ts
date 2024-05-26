@@ -1,6 +1,7 @@
 import httpStatus from "http-status";
 import prisma from "../../../shared/prisma";
 import { RequestStatus } from "@prisma/client";
+import ApiError from "../../errors/ApiError";
 
 const createRequest = async (user: any, data: any) => {
   // console.log("Request for User = ", user);
@@ -12,8 +13,10 @@ const createRequest = async (user: any, data: any) => {
     },
   });
 
+  //Here I add throw new ApiError () instead of return
+
   if (!requester) {
-    return httpStatus.NOT_FOUND, "User not found";
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found");
   }
 
   // console.log("requester", requester);
@@ -27,7 +30,18 @@ const createRequest = async (user: any, data: any) => {
   });
 
   if (!existingDonor) {
-    return httpStatus.NOT_FOUND, "Donor not found";
+    throw new ApiError(httpStatus.NOT_FOUND, "Donor not found");
+  }
+
+  if (existingDonor.status !== "ACTIVE") {
+    throw new ApiError(httpStatus.BAD_REQUEST, "Donor is inactive");
+  }
+
+  if (existingDonor.bloodType !== data.bloodType) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      "Donor is not of the same blood type"
+    );
   }
 
   // console.log("existingDonor", existingDonor);
@@ -35,6 +49,7 @@ const createRequest = async (user: any, data: any) => {
   const requestData = {
     donorId: data.donorId,
     requesterId,
+    bloodType: data.bloodType,
     phoneNumber: data.phoneNumber,
     dateOfDonation: data.dateOfDonation,
     hospitalName: data.hospitalName,

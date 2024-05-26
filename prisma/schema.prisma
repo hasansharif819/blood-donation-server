@@ -41,6 +41,7 @@ model Request {
   donorId            String
   requesterId        String?
   phoneNumber        String
+  bloodType          BloodGroup?
   dateOfDonation     String
   hospitalName       String
   hospitalAddress    String
