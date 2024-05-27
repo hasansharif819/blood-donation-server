@@ -273,30 +273,56 @@ const updateMyRequestForBlood = async (id: string, user: any, payload: any) => {
     );
   }
 
+  let donorId = payload.donorId;
+  console.log("Donor Id = ", donorId);
+  if (!payload.donorId) {
+    donorId = requestedData.donorId;
+  }
+
+  // const donorId = data.donorId;
+  const existingDonor = await prisma.user.findUnique({
+    where: {
+      id: donorId,
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      bloodType: true,
+      location: true,
+      city: true,
+      profilePicture: true,
+      totalDonations: true,
+      availability: true,
+      status: true,
+      userProfile: true,
+    },
+  });
+
+  if (!existingDonor) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Donor not found");
+  }
+
+  if (existingDonor.status !== "ACTIVE") {
+    throw new ApiError(httpStatus.BAD_REQUEST, "Donor is inactive");
+  }
+
+  let bloodType = payload.bloodType;
+  if (!bloodType) {
+    bloodType = requestedData.bloodType;
+  }
+
+  if (existingDonor.bloodType !== bloodType) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      "Donor is not of the same blood type"
+    );
+  }
+
   const updatedPayload = {
     ...payload,
     requestStatus: "PENDING",
   };
-
-  // console.log("Requested Data = ", requestedData);
-
-  // const donorEmail = user.email;
-
-  // const donorData = await prisma.user.findUnique({
-  //   where: {
-  //     email: donorEmail,
-  //   },
-  // });
-
-  // if (!donorData) {
-  //   return httpStatus.UNAUTHORIZED, "unauthorized error";
-  // }
-
-  // const donorId = donorData.id;
-
-  // if (donorId !== requestedData.donorId) {
-  //   return httpStatus.UNAUTHORIZED, "unauthorized error";
-  // }
 
   const updateRequestForBlood = await prisma.request.update({
     where: {
@@ -305,7 +331,7 @@ const updateMyRequestForBlood = async (id: string, user: any, payload: any) => {
     data: updatedPayload,
   });
 
-  return updateRequestForBlood;
+  return { ...updateRequestForBlood, donor: existingDonor };
 };
 
 export const requestServices = {
