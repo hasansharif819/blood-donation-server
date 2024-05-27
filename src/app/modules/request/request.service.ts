@@ -334,10 +334,43 @@ const updateMyRequestForBlood = async (id: string, user: any, payload: any) => {
   return { ...updateRequestForBlood, donor: existingDonor };
 };
 
+//Delete my Blood Request
+const deleteMyRequest = async (id: string, user: any) => {
+  const loggedInUserId = user.userId;
+
+  const requestedData = await prisma.request.findUnique({
+    where: {
+      id,
+    },
+  });
+
+  if (!requestedData) {
+    throw new ApiError(
+      httpStatus.NOT_FOUND,
+      "Provided request Id is not found"
+    );
+  }
+
+  if (loggedInUserId !== requestedData.requesterId) {
+    throw new ApiError(
+      httpStatus.UNAUTHORIZED,
+      "You are not unauthorized to Delete"
+    );
+  }
+
+  const deleteRequest = await prisma.request.delete({
+    where: {
+      id,
+    },
+  });
+  return deleteRequest;
+};
+
 export const requestServices = {
   createRequest,
   myDonationRequests,
   updateRequest,
   donationRequestsMadeByMe,
   updateMyRequestForBlood,
+  deleteMyRequest,
 };

@@ -73,10 +73,25 @@ const updateMyRequest = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+//Delete My Request
+const deleteMyRequest = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const user = req.user;
+  const result = await requestServices.deleteMyRequest(id, user);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Successfully deleted my donation request",
+    data: result,
+  });
+});
+
 export const requestController = {
   createRequest,
   myDonationRequests,
   updateRequest,
   donationRequestsMadeByMe,
   updateMyRequest,
+  deleteMyRequest,
 };

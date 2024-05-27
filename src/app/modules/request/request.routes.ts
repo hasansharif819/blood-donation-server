@@ -40,4 +40,11 @@ router.patch(
   requestController.updateMyRequest
 );
 
+//Delete my Blood Request
+router.delete(
+  "/delete-my-donation-request/:id",
+  auth(UserRole.ADMIN, UserRole.USER),
+  requestController.deleteMyRequest
+);
+
 export const requestRoutes = router;
