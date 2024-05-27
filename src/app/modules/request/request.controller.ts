@@ -28,6 +28,20 @@ const myDonationRequests = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+//Donation requests made by me
+const donationRequestsMadeByMe = catchAsync(
+  async (req: Request, res: Response) => {
+    const user = req.user;
+    const result = await requestServices.donationRequestsMadeByMe(user);
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: "Donation requests thats made by me are retrieved successfully",
+      data: result,
+    });
+  }
+);
+
 const updateRequest = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
   const user = req.user;
@@ -45,4 +59,5 @@ export const requestController = {
   createRequest,
   myDonationRequests,
   updateRequest,
+  donationRequestsMadeByMe,
 };

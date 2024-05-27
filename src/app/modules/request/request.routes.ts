@@ -20,6 +20,13 @@ router.get(
   requestController.myDonationRequests
 );
 
+//Donation Requests Made By Me
+router.get(
+  "/donation-request-made-by-me",
+  auth(UserRole.USER, UserRole.ADMIN),
+  requestController.donationRequestsMadeByMe
+);
+
 router.put(
   "/donation-request/:id",
   auth(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.USER),

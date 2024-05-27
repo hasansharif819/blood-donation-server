@@ -94,10 +94,11 @@ const createRequest = async (user: any, data: any) => {
 };
 
 const myDonationRequests = async (user: any) => {
-  const userEmail = user.email;
+  // const userEmail = user.email;
+  const loggedInUserId = user.userId;
   const userId = await prisma.user.findUnique({
     where: {
-      email: userEmail,
+      id: loggedInUserId,
     },
   });
 
@@ -145,6 +146,63 @@ const myDonationRequests = async (user: any) => {
 
   // console.log("Result = ", requestsWithRequester);
   return requestsWithRequester;
+};
+
+//Donation Request made by me
+const donationRequestsMadeByMe = async (user: any) => {
+  const loggedInUserId = user.userId;
+  const requestUser = await prisma.user.findUnique({
+    where: {
+      id: loggedInUserId,
+    },
+  });
+
+  if (!requestUser) {
+    return httpStatus.NOT_FOUND, "User not found";
+  }
+
+  const requesterId = requestUser.id;
+
+  const result = await prisma.request.findMany({
+    where: {
+      requesterId,
+    },
+  });
+
+  // console.log("My Requests = ", result);
+
+  // Fetch Donor information for each request
+  const myRequestsForDonor = await Promise.all(
+    result.map(async (request) => {
+      if (!request.donorId) {
+        return {
+          ...request,
+          donor: null,
+        };
+      }
+      const bloodDonor = await prisma.user.findUnique({
+        where: {
+          id: request.donorId,
+        },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          location: true,
+          bloodType: true,
+          availability: true,
+        },
+      });
+
+      return {
+        ...request,
+        donor: bloodDonor || null,
+      };
+    })
+  );
+
+  // console.log("myRequestsForDonor = ", myRequestsForDonor);
+  return myRequestsForDonor;
 };
 
 const updateRequest = async (
@@ -198,4 +256,5 @@ export const requestServices = {
   createRequest,
   myDonationRequests,
   updateRequest,
+  donationRequestsMadeByMe,
 };
