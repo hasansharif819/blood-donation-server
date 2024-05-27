@@ -55,9 +55,28 @@ const updateRequest = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+//Update My Request
+const updateMyRequest = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const user = req.user;
+  const result = await requestServices.updateMyRequestForBlood(
+    id,
+    user,
+    req.body
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Successfully updated my donation request",
+    data: result,
+  });
+});
+
 export const requestController = {
   createRequest,
   myDonationRequests,
   updateRequest,
   donationRequestsMadeByMe,
+  updateMyRequest,
 };

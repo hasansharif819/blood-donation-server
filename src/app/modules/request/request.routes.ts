@@ -33,4 +33,11 @@ router.put(
   requestController.updateRequest
 );
 
+router.patch(
+  "/update-my-donation-request/:id",
+  auth(UserRole.ADMIN, UserRole.USER),
+  validateRequest(requestValidation.updateMyBloodRequest),
+  requestController.updateMyRequest
+);
+
 export const requestRoutes = router;

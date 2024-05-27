@@ -252,9 +252,66 @@ const updateRequest = async (
   return updateRequestStatus;
 };
 
+//Update my Requests
+const updateMyRequestForBlood = async (id: string, user: any, payload: any) => {
+  const loggedInUserId = user.userId;
+
+  const requestedData = await prisma.request.findUnique({
+    where: {
+      id,
+    },
+  });
+
+  if (!requestedData) {
+    return httpStatus.NOT_FOUND, "Provided request Id is not found";
+  }
+
+  if (loggedInUserId !== requestedData.requesterId) {
+    throw new ApiError(
+      httpStatus.UNAUTHORIZED,
+      "You are not unauthorized to update"
+    );
+  }
+
+  const updatedPayload = {
+    ...payload,
+    requestStatus: "PENDING",
+  };
+
+  // console.log("Requested Data = ", requestedData);
+
+  // const donorEmail = user.email;
+
+  // const donorData = await prisma.user.findUnique({
+  //   where: {
+  //     email: donorEmail,
+  //   },
+  // });
+
+  // if (!donorData) {
+  //   return httpStatus.UNAUTHORIZED, "unauthorized error";
+  // }
+
+  // const donorId = donorData.id;
+
+  // if (donorId !== requestedData.donorId) {
+  //   return httpStatus.UNAUTHORIZED, "unauthorized error";
+  // }
+
+  const updateRequestForBlood = await prisma.request.update({
+    where: {
+      id,
+    },
+    data: updatedPayload,
+  });
+
+  return updateRequestForBlood;
+};
+
 export const requestServices = {
   createRequest,
   myDonationRequests,
   updateRequest,
   donationRequestsMadeByMe,
+  updateMyRequestForBlood,
 };

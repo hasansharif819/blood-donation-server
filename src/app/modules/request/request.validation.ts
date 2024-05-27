@@ -42,6 +42,30 @@ const createRequest = z.object({
   }),
 });
 
+//Update My Request
+const updateMyBloodRequest = z.object({
+  body: z.object({
+    donorId: z.string().optional(),
+    phoneNumber: z.string().optional(),
+    bloodType: z
+      .enum([
+        BloodGroup.AB_NEGATIVE,
+        BloodGroup.AB_POSITIVE,
+        BloodGroup.A_NEGATIVE,
+        BloodGroup.A_POSITIVE,
+        BloodGroup.B_NEGATIVE,
+        BloodGroup.B_POSITIVE,
+        BloodGroup.O_NEGATIVE,
+        BloodGroup.O_POSITIVE,
+      ])
+      .optional(),
+    dateOfDonation: z.string().optional(),
+    hospitalName: z.string().optional(),
+    hospitalAddress: z.string().optional(),
+    reason: z.string().optional(),
+  }),
+});
+
 const updateRequest = z.object({
   body: z.object({
     requestStatus: z.enum([
@@ -54,5 +78,6 @@ const updateRequest = z.object({
 
 export const requestValidation = {
   createRequest,
+  updateMyBloodRequest,
   updateRequest,
 };
