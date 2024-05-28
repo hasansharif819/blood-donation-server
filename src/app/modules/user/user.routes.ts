@@ -16,4 +16,11 @@ router.post(
   userController.createUser
 );
 
+//Delete User
+router.put(
+  "/donors/:id",
+  auth(UserRole.ADMIN),
+  userController.deleteUserController
+);
+
 export const userRoutes = router;

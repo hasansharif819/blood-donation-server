@@ -35,6 +35,10 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
     });
   }
 
+  andCondions.push({
+    status: UserStatus.ACTIVE,
+  });
+
   const whereConditons: Prisma.UserWhereInput =
     andCondions.length > 0 ? { AND: andCondions } : {};
 
@@ -186,8 +190,36 @@ const createUser = async (data: any) => {
   return result;
 };
 
+//Delete User
+const deleteUser = async (id: string) => {
+  const userData = await prisma.user.findUnique({
+    where: {
+      id,
+    },
+  });
+
+  // console.log("User data = ", userData);
+
+  if (!userData) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User is not found");
+  }
+
+  const deletedUser = await prisma.user.update({
+    where: {
+      id,
+    },
+    data: {
+      status: UserStatus.DELETED,
+    },
+  });
+
+  // console.log("Deleted User:", deletedUser);
+  return deletedUser;
+};
+
 export const userServices = {
   getAllFromDB,
   getByIdFromDB,
   createUser,
+  deleteUser,
 };

@@ -3,6 +3,7 @@ export const userSearchAbleFields: string[] = [
   "bloodType",
   "location",
   "name",
+  "city",
 ]; // only for search term
 
 export const userFilterableFields: string[] = [
@@ -12,4 +13,5 @@ export const userFilterableFields: string[] = [
   "name",
   "location",
   "bloodType",
+  "city",
 ]; // for all filtering
