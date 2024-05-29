@@ -1,9 +1,8 @@
 export const userSearchAbleFields: string[] = [
   "email",
-  "bloodType",
+  "city",
   "location",
   "name",
-  "city",
 ]; // only for search term
 
 export const userFilterableFields: string[] = [
