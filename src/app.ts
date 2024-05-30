@@ -14,8 +14,8 @@ const app: Application = express();
 app.use(
   cors({
     origin: [
+      "https://blood-donation-app-kohl.vercel.app",
       "http://localhost:3000",
-      "https://blood-donation-2x886ncbh-hasansharif819s-projects.vercel.app",
     ],
     credentials: true,
   })
@@ -30,7 +30,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req: Request, res: Response) => {
   res.send({
-    Message: "Blood Donation server..",
+    Message: "Blood Donation App Server is Running...",
   });
 });
 
