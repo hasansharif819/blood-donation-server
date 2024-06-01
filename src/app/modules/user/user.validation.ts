@@ -42,7 +42,16 @@ const updateUser = z.object({
   }),
 });
 
+//update user by admin
+const updateUserByAdmin = z.object({
+  body: z.object({
+    role: z.string().optional(),
+    status: z.string().optional(),
+  }),
+});
+
 export const userValidation = {
   createUser,
   updateUser,
+  updateUserByAdmin,
 };

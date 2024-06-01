@@ -296,9 +296,42 @@ const deleteUser = async (id: string) => {
   return deletedUser;
 };
 
+//partial updating the user
+const updateUserByAdmin = async (data: any) => {
+  const userId = data.id;
+
+  // console.log(userId);
+
+  // Find the user and include their profile
+  const user = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+  });
+
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User is not found");
+  }
+
+  const userData = {
+    role: data.role,
+    status: data.status,
+  };
+
+  const updateUserData = await prisma.user.update({
+    where: {
+      id: userId,
+    },
+    data: userData,
+  });
+
+  return updateUserData;
+};
+
 export const userServices = {
   getAllFromDB,
   getByIdFromDB,
   createUser,
   deleteUser,
+  updateUserByAdmin,
 };

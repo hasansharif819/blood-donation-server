@@ -23,4 +23,12 @@ router.put(
   userController.deleteUserController
 );
 
+//Partially updating user by admin
+router.put(
+  "/update-user",
+  auth(UserRole.ADMIN),
+  validateRequest(userValidation.updateUserByAdmin),
+  userController.updateUserByAdmin
+);
+
 export const userRoutes = router;

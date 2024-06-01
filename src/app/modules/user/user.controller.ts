@@ -58,9 +58,22 @@ const deleteUserController = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+//Partially updating user by admin
+const updateUserByAdmin = catchAsync(async (req: Request, res: Response) => {
+  const result = await userServices.updateUserByAdmin(req.body);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "You have successfully updated the user",
+    data: result,
+  });
+});
+
 export const userController = {
   getAllFromDB,
   getByIdFromDB,
   createUser,
   deleteUserController,
+  updateUserByAdmin,
 };
