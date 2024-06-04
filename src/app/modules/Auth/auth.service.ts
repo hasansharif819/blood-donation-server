@@ -148,7 +148,7 @@ const forgotPassword = async (payload: { email: string }) => {
   // console.log("Forgot password...", userData);
 
   const resetPassToken = jwtHelpers.generateToken(
-    { email: userData.email, role: userData.role },
+    { userId: userData.id, email: userData.email, role: userData.role },
     config.jwt.reset_pass_secret as Secret,
     config.jwt.reset_pass_token_expires_in as string
   );
@@ -204,9 +204,6 @@ const resetPassword = async (
   if (!isValidToken) {
     throw new ApiError(httpStatus.FORBIDDEN, "Forbidden!");
   }
-
-  // console.log("isValidToken= ", payload.id);
-  // console.log("Password= ", payload.newPassword);
 
   // hash password
   const password = await bcrypt.hash(payload.newPassword, 12);
