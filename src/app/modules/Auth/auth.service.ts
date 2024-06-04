@@ -170,7 +170,7 @@ const forgotPassword = async (payload: { email: string }) => {
       </div>
       `
   );
-  console.log("Reset pass link = ", resetPassLink);
+  // console.log("Reset pass link = ", resetPassLink);
 };
 
 const resetPassword = async (
