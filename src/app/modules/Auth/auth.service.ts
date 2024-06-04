@@ -162,11 +162,15 @@ const forgotPassword = async (payload: { email: string }) => {
     userData.email,
     `
       <div>
-          <p>Dear User, ${userData.name}</p>
+          <h5>Hello Dear ${userData.name}</h5>
           <a href=${resetPassLink}>Your reset password link is here. 
           Please click the link to reset your password.This link is valid for 5 minutes.
           </a>
-          <p>Do not share this link. Thank you</p>
+          <p>Please do not share this link with others. Stay with us.</p>
+          <h5>Donate Blood Save Life</h5>
+          <h5>Thank you</h5>
+          <h5>Best Regards</h5>
+          <h5>Blood Donation App</h5>
       </div>
       `
   );
@@ -175,11 +179,11 @@ const forgotPassword = async (payload: { email: string }) => {
 
 const resetPassword = async (
   token: string,
-  payload: { id: string; password: string }
+  payload: { id: string; newPassword: string }
 ) => {
-  console.log({ token, payload });
+  // console.log({ token, payload });
 
-  const userData = await prisma.user.findUnique({
+  const userData = await prisma.user.findMany({
     where: {
       id: payload.id,
       status: UserStatus.ACTIVE,
@@ -190,6 +194,8 @@ const resetPassword = async (
     throw new ApiError(httpStatus.NOT_FOUND, "User does not exist");
   }
 
+  // console.log("User data from Reset pass = ", userData);
+
   const isValidToken = jwtHelpers.verifyToken(
     token,
     config.jwt.reset_pass_secret as Secret
@@ -199,8 +205,11 @@ const resetPassword = async (
     throw new ApiError(httpStatus.FORBIDDEN, "Forbidden!");
   }
 
+  // console.log("isValidToken= ", payload.id);
+  // console.log("Password= ", payload.newPassword);
+
   // hash password
-  const password = await bcrypt.hash(payload.password, 12);
+  const password = await bcrypt.hash(payload.newPassword, 12);
 
   // update into database
   await prisma.user.update({
