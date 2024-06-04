@@ -50,7 +50,51 @@ const changePassword = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const refreshToken = catchAsync(async (req: Request, res: Response) => {
+  const { refreshToken } = req.cookies;
+
+  const result = await AuthServices.refreshToken(refreshToken);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Access token genereated successfully!",
+    data: result,
+    // data: {
+    //     accessToken: result.accessToken,
+    //     needPasswordChange: result.needPasswordChange
+    // }
+  });
+});
+
+const forgotPassword = catchAsync(async (req: Request, res: Response) => {
+  await AuthServices.forgotPassword(req.body);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Check your email!, The link is valid within 5minutes",
+    data: null,
+  });
+});
+
+const resetPassword = catchAsync(async (req: Request, res: Response) => {
+  const token = req.headers.authorization || "";
+
+  await AuthServices.resetPassword(token, req.body);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Password Reset! Please login with your new password",
+    data: null,
+  });
+});
+
 export const AuthController = {
   loginUser,
   changePassword,
+  refreshToken,
+  forgotPassword,
+  resetPassword,
 };
