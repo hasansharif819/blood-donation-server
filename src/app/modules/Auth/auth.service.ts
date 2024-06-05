@@ -179,7 +179,7 @@ const forgotPassword = async (payload: { email: string }) => {
 
 const resetPassword = async (
   token: string,
-  payload: { id: string; newPassword: string }
+  payload: { id: string; password: string }
 ) => {
   // console.log({ token, payload });
 
@@ -194,8 +194,6 @@ const resetPassword = async (
     throw new ApiError(httpStatus.NOT_FOUND, "User does not exist");
   }
 
-  // console.log("User data from Reset pass = ", userData);
-
   const isValidToken = jwtHelpers.verifyToken(
     token,
     config.jwt.reset_pass_secret as Secret
@@ -206,10 +204,10 @@ const resetPassword = async (
   }
 
   // hash password
-  const password = await bcrypt.hash(payload.newPassword, 12);
+  const password = await bcrypt.hash(payload.password, 12);
 
   // update into database
-  await prisma.user.update({
+  const result = await prisma.user.update({
     where: {
       id: payload.id,
     },
@@ -217,6 +215,8 @@ const resetPassword = async (
       password,
     },
   });
+  // console.log("result = ", result);
+  return result;
 };
 
 export const AuthServices = {
