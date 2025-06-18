@@ -13,83 +13,163 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// User model for authentication and profile information
 model User {
-  id                 String     @id @default(uuid())
+  id                 String          @id @default(uuid())
   name               String
-  email              String     @unique
+  email              String          @unique
   password           String
-  needPasswordChange Boolean    @default(true)
-  role               UserRole    @default(USER)
-  bloodType          BloodGroup 
+  needPasswordChange Boolean         @default(true)
+  role               UserRole        @default(USER)
+  bloodType          BloodGroup
   location           String
   city               String?
   profilePicture     String?
-  totalDonations     Int @default(0)
-  availability       Boolean    @default(true)
-  status             UserStatus @default(ACTIVE)
-  createdAt          DateTime   @default(now())
-  updatedAt          DateTime   @updatedAt
+  totalDonations     Int             @default(0)
+  availability       Boolean         @default(true)
+  status             UserStatus      @default(ACTIVE)
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
   userProfile        UserProfile?
-  donor    Request[]    @relation("DonatedRequests")
-  // requester  Request[]    @relation("RequestedRequests")
+  donatedRequests    Request[]       @relation("DonatedRequests")
+  posts              Post[]          @relation("UserPosts")
+  postApprovals      PostApproval[]  @relation("UserApprovals")
+  comments           Comment[]       @relation("UserComments")
 
+  @@index([bloodType]) // Optimize queries by blood type
+  @@index([status])    // Optimize queries by user status
   @@map("users")
 }
 
-model Request {
-  id                 String     @id @default(uuid())
-  donorId            String
-  requesterId        String?
-  phoneNumber        String
-  bloodType          BloodGroup?
-  dateOfDonation     String
-  hospitalName       String
-  hospitalAddress    String
-  reason             String
-  requestStatus      RequestStatus @default(PENDING)
-  createdAt          DateTime   @default(now())
-  updatedAt          DateTime   @updatedAt
-
-  donor              User          @relation("DonatedRequests", fields: [donorId], references: [id])
-  // requester          User          @relation("RequestedRequests", fields: [requesterId], references: [id])
-
-  @@map("requests")
-}
-
+// UserProfile model for additional user details
 model UserProfile {
   id                 String     @id @default(uuid())
   userId             String     @unique
-  bio                String     
+  bio                String
   age                Int
-  contactNumber      String?
-  lastDonationDate   String    
+  contactNumber      String
+  gender             Gender
+  lastDonationDate   String
   createdAt          DateTime   @default(now())
   updatedAt          DateTime   @updatedAt
-  user User @relation(fields: [userId], references: [id])
+  user               User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("userprofiles")
 }
 
+// Request model for blood donation requests
+model Request {
+  id                 String         @id @default(uuid())
+  donorId            String
+  requesterId        String?
+  phoneNumber        String
+  bloodType          BloodGroup
+  numberOfBags       Int
+  dateOfDonation     String
+  donationTime       TimeOfDay
+  hospitalName       String
+  hospitalAddress    String
+  reason             String
+  requestStatus      RequestStatus  @default(PENDING)
+  isManaged          Boolean        @default(false)
+  isActive           Boolean        @default(true)
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  donor              User           @relation("DonatedRequests", fields: [donorId], references: [id], onDelete: Restrict)
 
+  @@index([bloodType])       // Optimize queries by blood type
+  @@index([requestStatus])   // Optimize queries by request status
+  @@map("requests")
+}
+
+// Post model for blood donation posts
+model Post {
+  id                 String         @id @default(uuid())
+  userId             String
+  bloodType          BloodGroup
+  numberOfBags       Int
+  dateOfDonation     String
+  donationTime       TimeOfDay
+  hospitalName       String
+  hospitalAddress    String
+  reason             String
+  postStatus         PostStatus     @default(PENDING)
+  isManaged          Boolean        @default(false)
+  isActive           Boolean        @default(true)
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  user               User           @relation("UserPosts", fields: [userId], references: [id], onDelete: Cascade)
+  approvals          PostApproval[] @relation("PostApprovals")
+  comments           Comment[]      @relation("PostComments")
+
+  @@index([bloodType])    // Optimize queries by blood type
+  @@index([postStatus])   // Optimize queries by post status
+  @@map("posts")
+}
+
+// PostApproval model for tracking post approvals by users
+model PostApproval {
+  id                 String     @id @default(uuid())
+  postId             String
+  userId             String
+  createdAt          DateTime   @default(now())
+  post               Post       @relation("PostApprovals", fields: [postId], references: [id], onDelete: Cascade)
+  user               User       @relation("UserApprovals", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId]) // Prevent duplicate approvals
+  @@map("post_approvals")
+}
+
+// Comment model for post comments and replies
+model Comment {
+  id                 String     @id @default(uuid())
+  postId             String
+  userId             String
+  content            String
+  isActive           Boolean    @default(true)
+  parentId           String?    // For replies to other comments
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+  post               Post       @relation("PostComments", fields: [postId], references: [id], onDelete: Cascade)
+  user               User       @relation("UserComments", fields: [userId], references: [id], onDelete: Cascade)
+  parent             Comment?   @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies            Comment[]  @relation("CommentReplies")
+
+  @@index([postId])  // Optimize queries by post
+  @@map("comments")
+}
+
+// Enum for user status
 enum UserStatus {
   ACTIVE
   BLOCKED
   DELETED
 }
 
+// Enum for user role
 enum UserRole {
   SUPER_ADMIN
   ADMIN
   USER
 }
 
+// Enum for request status
 enum RequestStatus {
   PENDING
   APPROVED
   REJECTED
 }
 
-enum BloodGroup { 
+// Enum for post status
+enum PostStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  FULFILLED
+}
+
+// Enum for blood group
+enum BloodGroup {
   A_POSITIVE
   A_NEGATIVE
   B_POSITIVE
@@ -98,4 +178,19 @@ enum BloodGroup {
   AB_NEGATIVE
   O_POSITIVE
   O_NEGATIVE
+}
+
+// Enum for Genders
+enum Gender {
+  MALE
+  FEMALE
+  OTHERS
+}
+
+// Enum for Time Of Day
+enum TimeOfDay {
+  MORNING
+  NOON
+  EVENING
+  NIGHT
 }

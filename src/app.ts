@@ -1,13 +1,14 @@
 import express, { Application, NextFunction, Request, Response } from "express";
 import cors from "cors";
-// import router from "./app/routes";
 import httpStatus from "http-status";
 import globalErrorHandler from "./app/middlewares/globalErrorHandler";
 import cookieParser from "cookie-parser";
-import { userRoutes } from "./app/modules/user/user.routes";
-import { AuthRoutes } from "./app/modules/Auth/auth.routes";
-import { requestRoutes } from "./app/modules/request/request.routes";
-import { profileRoutes } from "./app/modules/profile/profile.routes";
+// import { userRoutes } from "./app/modules/user/user.routes";
+// import { AuthRoutes } from "./app/modules/Auth/auth.routes";
+// import { requestRoutes } from "./app/modules/request/request.routes";
+// import { profileRoutes } from "./app/modules/profile/profile.routes";
+// import { postRoutes } from "./app/modules/post/post.routes";
+import router from "./app/routes";
 
 const app: Application = express();
 
@@ -34,11 +35,12 @@ app.get("/", (req: Request, res: Response) => {
   });
 });
 
-// app.use("/api", router);
-app.use("/api", userRoutes);
-app.use("/api", AuthRoutes);
-app.use("/api", requestRoutes);
-app.use("/api", profileRoutes);
+app.use("/api", router);
+// app.use("/api", userRoutes);
+// app.use("/api", AuthRoutes);
+// app.use("/api", requestRoutes);
+// app.use("/api", profileRoutes);
+// app.use("/api", postRoutes);
 
 app.use(globalErrorHandler);
 

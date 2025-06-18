@@ -7,7 +7,6 @@ import httpStatus from "http-status";
 import { userFilterableFields } from "./user.constant";
 
 const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
-  // console.log(req.query)
   const filters = pick(req.query, userFilterableFields);
   const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
 
@@ -33,21 +32,9 @@ const getByIdFromDB = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const createUser = catchAsync(async (req: Request, res: Response) => {
-  const result = await userServices.createUser(req.body);
-  sendResponse(res, {
-    // statusCode: httpStatus.OK,
-    success: true,
-    statusCode: 201,
-    message: "User registered successfuly!",
-    data: result,
-  });
-});
-
 //Delete user
 const deleteUserController = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-  // console.log("Params = ", id);
   const result = await userServices.deleteUser(id);
 
   sendResponse(res, {
@@ -73,7 +60,7 @@ const updateUserByAdmin = catchAsync(async (req: Request, res: Response) => {
 export const userController = {
   getAllFromDB,
   getByIdFromDB,
-  createUser,
+  // createUser,
   deleteUserController,
   updateUserByAdmin,
 };

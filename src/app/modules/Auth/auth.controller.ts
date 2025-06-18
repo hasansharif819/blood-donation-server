@@ -4,6 +4,17 @@ import { AuthServices } from "./auth.service";
 import sendResponse from "../../../shared/sendResponse";
 import httpStatus from "http-status";
 
+const registerUser = catchAsync(async (req: Request, res: Response) => {
+  const result = await AuthServices.registerUser(req.body);
+  sendResponse(res, {
+    // statusCode: httpStatus.OK,
+    success: true,
+    statusCode: 201,
+    message: "User registered successfuly!",
+    data: result,
+  });
+});
+
 const loginUser = catchAsync(async (req: Request, res: Response) => {
   const result = await AuthServices.loginUser(req.body);
 
@@ -100,6 +111,7 @@ const resetPassword = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const AuthController = {
+  registerUser,
   loginUser,
   changePassword,
   refreshToken,

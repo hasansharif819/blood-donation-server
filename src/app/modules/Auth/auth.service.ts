@@ -11,6 +11,66 @@ import { AuthUtils } from "./auth.utils";
 import { hashedPassword } from "../../../helpers/hashedPasswordHelper";
 import emailSender from "./emailSender";
 
+//Create user
+const registerUser = async (data: any) => {
+  const existingUser = await prisma.user.findUnique({
+    where: { email: data.email },
+  });
+
+  if (existingUser) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'User already exists');
+  }
+
+  const hashedPassword = await bcrypt.hash(data.password, 12);
+
+  return await prisma.$transaction(async (tx) => {
+    // Step 1: Create user
+    const createdUser = await tx.user.create({
+      data: {
+        name: data.name,
+        email: data.email,
+        password: hashedPassword,
+        role: data.role || 'USER',
+        bloodType: data.bloodType,
+        location: data.location,
+        city: data.city,
+        totalDonations: data.totalDonations ?? 0,
+        availability: data.availability ?? true,
+        status: data.status ?? 'ACTIVE',
+      },
+    });
+
+    // Step 2: Create user profile
+    const createdUserProfile = await tx.userProfile.create({
+      data: {
+        userId: createdUser.id,
+        age: data.age,
+        bio: data.bio,
+        gender: data.gender,
+        contactNumber: data.contactNumber ?? '',
+        lastDonationDate: data.lastDonationDate,
+      },
+    });
+
+    // Step 3: Select and return combined result
+    const userDetails = await tx.user.findUnique({
+      where: { id: createdUser.id },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        bloodType: true,
+        location: true,
+        availability: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    return { ...userDetails, userProfile: createdUserProfile };
+  });
+};
+
 const loginUser = async (payload: { email: string; password: string }) => {
   // console.log("User login...", payload);
   const userData = await prisma.user.findUniqueOrThrow({
@@ -220,6 +280,7 @@ const resetPassword = async (
 };
 
 export const AuthServices = {
+  registerUser,
   loginUser,
   changePassword,
   forgotPassword,

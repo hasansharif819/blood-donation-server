@@ -7,25 +7,19 @@ import auth from "../../middlewares/auth";
 
 const router = express.Router();
 
-router.get("/donor-list", userController.getAllFromDB);
-router.get("/donor-list/:id", userController.getByIdFromDB);
-
-router.post(
-  "/register",
-  validateRequest(userValidation.createUser),
-  userController.createUser
-);
+router.get("/", userController.getAllFromDB);
+router.get("/:id", userController.getByIdFromDB);
 
 //Delete User
 router.put(
-  "/donors/:id",
+  "/:id",
   auth(UserRole.ADMIN),
   userController.deleteUserController
 );
 
 //Partially updating user by admin
 router.put(
-  "/update-user",
+  "/admin/:id",
   auth(UserRole.ADMIN),
   validateRequest(userValidation.updateUserByAdmin),
   userController.updateUserByAdmin

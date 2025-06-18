@@ -1,50 +1,50 @@
 import express from "express";
-import { requestController } from "./request.controller";
 import auth from "../../middlewares/auth";
 import { UserRole } from "@prisma/client";
 import validateRequest from "../../middlewares/validateRequest";
-import { requestValidation } from "./request.validation";
+import { postValidation } from "./post.validation";
+import { postController } from "./post.controller";
 
 const router = express.Router();
 
 router.post(
   "/create",
   auth(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.USER),
-  validateRequest(requestValidation.createRequest),
-  requestController.createRequest
+  validateRequest(postValidation.createPostValidationSchema),
+  postController.createPost
 );
 
 router.get(
   "/",
   auth(UserRole.USER),
-  requestController.myDonationRequests
+  postController.myDonationPosts
 );
 
-//Donation Requests Made By Me
+//Post Made By Me
 router.get(
-  "/request-made-by-me",
+  "/post-made-by-me",
   auth(UserRole.USER, UserRole.ADMIN),
-  requestController.donationRequestsMadeByMe
+  postController.postsMadeByMe
 );
 
 router.put(
   "/:id",
   auth(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.USER),
-  requestController.updateRequest
+  postController.updatePostStatus
 );
 
 router.patch(
   "/:id",
   auth(UserRole.ADMIN, UserRole.USER),
-  validateRequest(requestValidation.updateMyBloodRequest),
-  requestController.updateMyRequest
+  validateRequest(postValidation.updatePostStatus),
+  postController.updateMyPost
 );
 
-//Delete my Blood Request
+//Delete my Blood Post
 router.delete(
   "/:id",
   auth(UserRole.ADMIN, UserRole.USER),
-  requestController.deleteMyRequest
+  postController.deleteMyPost
 );
 
-export const requestRoutes = router;
+export const postRoutes = router;

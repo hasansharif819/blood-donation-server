@@ -1,26 +1,30 @@
-// import express from "express";
-// import { userRoutes } from "../modules/user/user.routes";
-// // import { userRoutes } from "../modules/User/user.routes";
-// // import { AdminRoutes } from '../modules/Admin/admin.routes';
-// // import { AuthRoutes } from "../modules/Auth/auth.routes";
+import express from "express";
+import { userRoutes } from "../modules/user/user.routes";
+import { AuthRoutes } from "../modules/Auth/auth.routes";
+import { requestRoutes } from "../modules/request/request.routes";
+import { postRoutes } from "../modules/post/post.routes";
 
-// const router = express.Router();
+const router = express.Router();
 
-// const moduleRoutes = [
-//   {
-//     path: "/register",
-//     route: userRoutes,
-//   },
-//   // {
-//   //     path: '/admin',
-//   //     route: AdminRoutes
-//   // },
-//   // {
-//   //   path: "/auth",
-//   //   route: AuthRoutes,
-//   // },
-// ];
+const moduleRoutes = [
+  {
+    path: "/auth",
+    route: AuthRoutes,
+  },
+  {
+      path: '/users',
+      route: userRoutes
+  },
+  {
+    path: "/requests",
+    route: requestRoutes,
+  },
+  {
+    path: "/posts",
+    route: postRoutes,
+  },
+];
 
-// moduleRoutes.forEach((route) => router.use(route.path, route.route));
+moduleRoutes.forEach((route) => router.use(route.path, route.route));
 
-// export default router;
+export default router;

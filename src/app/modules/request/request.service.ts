@@ -4,7 +4,6 @@ import { RequestStatus } from "@prisma/client";
 import ApiError from "../../errors/ApiError";
 
 const createRequest = async (user: any, data: any) => {
-  // console.log("Request for User = ", user);
 
   const userEmail = user.email;
   const requester = await prisma.user.findUnique({
@@ -13,13 +12,9 @@ const createRequest = async (user: any, data: any) => {
     },
   });
 
-  //Here I add throw new ApiError () instead of return
-
   if (!requester) {
     throw new ApiError(httpStatus.NOT_FOUND, "User not found");
   }
-
-  // console.log("requester", requester);
 
   const donorId = data.donorId;
   const requesterId = requester.id;
@@ -44,20 +39,19 @@ const createRequest = async (user: any, data: any) => {
     );
   }
 
-  // console.log("existingDonor", existingDonor);
-
   const requestData = {
     donorId: data.donorId,
     requesterId,
     bloodType: data.bloodType,
     phoneNumber: data.phoneNumber,
+    numberOfBags: data.numberOfBags,
     dateOfDonation: data.dateOfDonation,
+    donationTime: data.donationTime,
     hospitalName: data.hospitalName,
     hospitalAddress: data.hospitalAddress,
     reason: data.reason,
+    isManaged: data.isManaged || false
   };
-
-  // console.log("Request Data = ", requestData);
 
   const result = await prisma.request.create({
     data: requestData,
@@ -88,13 +82,10 @@ const createRequest = async (user: any, data: any) => {
     },
   });
 
-  // console.log("result", result);
-
   return result;
 };
 
 const myDonationRequests = async (user: any) => {
-  // const userEmail = user.email;
   const loggedInUserId = user.userId;
   const userId = await prisma.user.findUnique({
     where: {
@@ -144,7 +135,6 @@ const myDonationRequests = async (user: any) => {
     })
   );
 
-  // console.log("Result = ", requestsWithRequester);
   return requestsWithRequester;
 };
 
@@ -169,9 +159,6 @@ const donationRequestsMadeByMe = async (user: any) => {
     },
   });
 
-  // console.log("My Requests = ", result);
-
-  // Fetch Donor information for each request
   const myRequestsForDonor = await Promise.all(
     result.map(async (request) => {
       if (!request.donorId) {
@@ -201,7 +188,6 @@ const donationRequestsMadeByMe = async (user: any) => {
     })
   );
 
-  // console.log("myRequestsForDonor = ", myRequestsForDonor);
   return myRequestsForDonor;
 };
 
@@ -279,7 +265,6 @@ const updateMyRequestForBlood = async (id: string, user: any, payload: any) => {
     donorId = requestedData.donorId;
   }
 
-  // const donorId = data.donorId;
   const existingDonor = await prisma.user.findUnique({
     where: {
       id: donorId,
