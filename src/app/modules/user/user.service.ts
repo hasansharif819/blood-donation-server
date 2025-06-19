@@ -5,7 +5,7 @@ import { Prisma, User, UserStatus } from "@prisma/client";
 import ApiError from "../../errors/ApiError";
 import httpStatus from "http-status";
 import { IGenericResponse } from "../../../interfaces/common";
-import { IUserFilterRequest, SafeUser, UserRaw } from "./user.interface";
+import { IUserFilterRequest, SafeUser, SafeUserData, UserRaw } from "./user.interface";
 import { userSearchableFields } from "./user.constant";
 import { parseGender } from "../../../helpars/genderParse";
 
@@ -146,14 +146,27 @@ const getAllFromDB = async (
   };
 };
 
-//get by id
-const getByIdFromDB = async (id: string): Promise<User | null> => {
+// Get user by ID 
+const getByIdFromDB = async (id: string): Promise<SafeUserData | null> => {
   const result = await prisma.user.findUnique({
     where: {
       id,
       status: UserStatus.ACTIVE,
     },
-    include: {
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      bloodType: true,
+      location: true,
+      city: true,
+      profilePicture: true,
+      totalDonations: true,
+      availability: true,
+      status: true,
+      createdAt: true,
+      updatedAt: true,
       userProfile: {
         select: {
           id: true,
@@ -161,6 +174,7 @@ const getByIdFromDB = async (id: string): Promise<User | null> => {
           bio: true,
           age: true,
           lastDonationDate: true,
+          gender: true,
           createdAt: true,
           updatedAt: true,
         },

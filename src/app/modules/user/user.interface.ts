@@ -6,7 +6,7 @@
 //   city?: string | undefined;
 // };
 
-import { Gender, User } from "@prisma/client";
+import { BloodGroup, Gender, User, UserRole, UserStatus } from "@prisma/client";
 
 
 export interface IUserFilterRequest {
@@ -68,4 +68,30 @@ export type UserRaw = Omit<
   'password' | 'needPasswordChange'
 > & {
   userProfile?: UserProfileRaw | null;
+};
+
+export type SafeUserData = {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  bloodType: BloodGroup;
+  location: string;
+  city: string | null;
+  profilePicture: string | null;
+  totalDonations: number;
+  availability: boolean;
+  status: UserStatus;
+  createdAt: Date;
+  updatedAt: Date;
+  userProfile: {
+    id: string;
+    userId: string;
+    bio: string | null;
+    age: number | null;
+    lastDonationDate: string;
+    gender: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+  } | null;
 };
