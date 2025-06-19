@@ -6,20 +6,36 @@ import sendResponse from "../../../shared/sendResponse";
 import httpStatus from "http-status";
 import { userFilterableFields } from "./user.constant";
 
+// const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
+//   const filters = pick(req.query, userFilterableFields);
+//   const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
+
+//   const result = await userServices.getAllFromDB(filters, options);
+
+//   sendResponse(res, {
+//     statusCode: httpStatus.OK,
+//     success: true,
+//     message: "Donors successfully found",
+//     meta: result.meta,
+//     data: result.data,
+//   });
+// });
+
 const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
   const filters = pick(req.query, userFilterableFields);
-  const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
+  const options = pick(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
 
   const result = await userServices.getAllFromDB(filters, options);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Donors successfully found",
+    message: 'Donors successfully found',
     meta: result.meta,
     data: result.data,
   });
 });
+
 
 const getByIdFromDB = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;

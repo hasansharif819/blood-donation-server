@@ -1,37 +1,49 @@
-type IOptions = {
-    page?: number,
-    limit?: number,
-    sortOrder?: string,
-    sortBy?: string
-}
+// type IOptions = {
+//     page?: number,
+//     limit?: number,
+//     sortOrder?: string,
+//     sortBy?: string
+// }
 
-type IOptionsResult = {
-    page: number,
-    limit: number,
-    skip: number,
-    sortBy: string,
-    sortOrder: string
-}
+import { IPaginationOptions } from "../app/interfaces/pagination";
 
-const calculatePagination = (options: IOptions): IOptionsResult => {
+// type IOptionsResult = {
+//     page: number,
+//     limit: number,
+//     skip: number,
+//     sortBy: string,
+//     sortOrder: string
+// }
 
-    const page: number = Number(options.page) || 1;
-    const limit: number = Number(options.limit) || 10;
-    const skip: number = (Number(page) - 1) * limit;
+// const calculatePagination = (options: IOptions): IOptionsResult => {
 
-    const sortBy: string = options.sortBy || 'createdAt';
-    const sortOrder: string = options.sortOrder || 'desc';
+//     const page: number = Number(options.page) || 1;
+//     const limit: number = Number(options.limit) || 10;
+//     const skip: number = (Number(page) - 1) * limit;
 
-    return {
-        page,
-        limit,
-        skip,
-        sortBy,
-        sortOrder
-    }
-}
+//     const sortBy: string = options.sortBy || 'createdAt';
+//     const sortOrder: string = options.sortOrder || 'desc';
 
+//     return {
+//         page,
+//         limit,
+//         skip,
+//         sortBy,
+//         sortOrder
+//     }
+// }
+
+
+// export const paginationHelper = {
+//     calculatePagination
+// }
 
 export const paginationHelper = {
-    calculatePagination
-}
+  calculatePagination: (options: IPaginationOptions) => {
+    const page = Number(options.page) || 1;
+    const limit = Number(options.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    return { page, limit, skip };
+  },
+};
