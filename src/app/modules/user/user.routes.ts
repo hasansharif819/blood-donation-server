@@ -11,14 +11,14 @@ router.get("/", userController.getAllFromDB);
 router.get("/:id", userController.getByIdFromDB);
 
 //Delete User
-router.put(
+router.patch(
   "/:id",
   auth(UserRole.ADMIN),
   userController.deleteUserController
 );
 
 //Partially updating user by admin
-router.put(
+router.patch(
   "/admin/:id",
   auth(UserRole.ADMIN),
   validateRequest(userValidation.updateUserByAdmin),

@@ -6,20 +6,6 @@ import sendResponse from "../../../shared/sendResponse";
 import httpStatus from "http-status";
 import { userFilterableFields } from "./user.constant";
 
-// const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
-//   const filters = pick(req.query, userFilterableFields);
-//   const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
-
-//   const result = await userServices.getAllFromDB(filters, options);
-
-//   sendResponse(res, {
-//     statusCode: httpStatus.OK,
-//     success: true,
-//     message: "Donors successfully found",
-//     meta: result.meta,
-//     data: result.data,
-//   });
-// });
 
 const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
   const filters = pick(req.query, userFilterableFields);
@@ -63,7 +49,8 @@ const deleteUserController = catchAsync(async (req: Request, res: Response) => {
 
 //Partially updating user by admin
 const updateUserByAdmin = catchAsync(async (req: Request, res: Response) => {
-  const result = await userServices.updateUserByAdmin(req.body);
+  const { id } = req.params;
+  const result = await userServices.updateUserByAdmin(id, req.body);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
