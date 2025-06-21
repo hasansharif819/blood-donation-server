@@ -8,12 +8,12 @@ import { userValidation } from "../user/user.validation";
 const router = express.Router();
 
 router.get(
-  "/my-profile",
+  "/me",
   auth(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.USER),
   profileController.myProfile
 );
 
-router.put(
+router.patch(
   "/update-my-profile",
   auth(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.USER),
   validateRequest(userValidation.updateUser),

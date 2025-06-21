@@ -1,10 +1,8 @@
-import httpStatus from "http-status";
 import prisma from "../../../shared/prisma";
 
 //My Profile
 const myProfile = async (user: any) => {
-  // const id = user.userId;
-  // console.log("user Id =", id);
+  console.log("User === ", user)
   const userEmail = user.email;
   const getMe = await prisma.user.findUnique({
     where: {
@@ -33,7 +31,8 @@ const myProfile = async (user: any) => {
 const updateProfile = async (user: any, data: any) => {
   const userId = user.userId;
 
-  // console.log(userId);
+  console.log("userId === ", userId);
+  console.log("data === ", data);
 
   // Find the user and include their profile
   const profile = await prisma.user.findUnique({
