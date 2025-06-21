@@ -1,4 +1,6 @@
 import prisma from "../../../shared/prisma";
+import dayjs from 'dayjs';
+
 
 //My Profile
 const myProfile = async (user: any) => {
@@ -83,6 +85,16 @@ const updateProfile = async (user: any, data: any) => {
   const filteredUserProfileData = Object.fromEntries(
     Object.entries(userProfileData).filter(([_, v]) => v !== undefined)
   );
+
+  const lastDonationDate = data.lastDonationDate;
+    if (lastDonationDate) {
+      const daysDiff = dayjs().diff(dayjs(lastDonationDate), 'day');
+      if (daysDiff < 120) {
+        filteredUserData.availability = false;
+      } else {
+        filteredUserData.availability = true;
+    }
+  }
 
   // Use a transaction to update both User and UserProfile
   const [updatedUser, updatedUserProfile] = await prisma.$transaction([
