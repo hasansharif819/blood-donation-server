@@ -5,7 +5,12 @@ import { Prisma, User, UserStatus } from "@prisma/client";
 import ApiError from "../../errors/ApiError";
 import httpStatus from "http-status";
 import { IGenericResponse } from "../../../interfaces/common";
-import { IUserFilterRequest, SafeUser, SafeUserData, UserRaw } from "./user.interface";
+import {
+  IUserFilterRequest,
+  SafeUser,
+  SafeUserData,
+  UserRaw,
+} from "./user.interface";
 import { userSearchableFields } from "./user.constant";
 import { parseGender } from "../../../helpars/genderParse";
 
@@ -20,36 +25,43 @@ const getAllFromDB = async (
 
   if (searchTerm) {
     andConditions.push({
-      OR: userSearchableFields.map(field => ({
+      OR: userSearchableFields.map((field) => ({
         [field]: {
           contains: searchTerm,
-          mode: 'insensitive',
+          mode: "insensitive",
         },
       })),
     });
   }
 
-  const stringFields = ['city', 'location'];
-  const booleanFields = ['availability'];
-  const enumFields = ['role', 'bloodType', 'status'];
+  const stringFields = ["city", "location"];
+  const booleanFields = ["availability"];
+  const enumFields = ["role", "bloodType", "status"];
 
   if (Object.keys(filterFields).length > 0) {
     Object.entries(filterFields).forEach(([key, value]) => {
-      if (value !== undefined && value !== '') {
+      if (value !== undefined && value !== "") {
         if (stringFields.includes(key)) {
           andConditions.push({
             [key]: {
               contains: String(value),
-              mode: 'insensitive',
+              mode: "insensitive",
             },
           });
         } else if (booleanFields.includes(key)) {
           andConditions.push({
             [key]: {
-              equals: value === 'true',
+              equals: value === "true",
             },
           });
-        } else if (key === 'gender') {
+        } else if (key === "name") {
+          andConditions.push({
+            [key]: {
+              contains: String(value),
+              mode: "insensitive",
+            },
+          });
+        } else if (key === "gender") {
           const genderEnum = parseGender(value);
           if (genderEnum) {
             andConditions.push({
@@ -85,58 +97,55 @@ const getAllFromDB = async (
     andConditions.length > 0 ? { AND: andConditions } : {};
 
   const usersRaw: UserRaw[] = await prisma.user.findMany({
-  where: whereCondition,
-  skip,
-  take: limit,
-  orderBy:
-    options.sortBy && options.sortOrder
-      ? { [options.sortBy]: options.sortOrder }
-      : { totalDonations: 'desc' },
-  select: {
-    id: true,
-    name: true,
-    email: true,
-    role: true,
-    bloodType: true,
-    location: true,
-    city: true,
-    profilePicture: true,
-    totalDonations: true,
-    availability: true,
-    status: true,
-    createdAt: true,
-    updatedAt: true,
-    userProfile: {
-      select: {
-        id: true,
-        userId: true,
-        bio: true,
-        age: true,
-        lastDonationDate: true,
-        gender: true,
-        createdAt: true,
-        updatedAt: true,
+    where: whereCondition,
+    skip,
+    take: limit,
+    orderBy:
+      options.sortBy && options.sortOrder
+        ? { [options.sortBy]: options.sortOrder }
+        : { totalDonations: "desc" },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      bloodType: true,
+      location: true,
+      city: true,
+      profilePicture: true,
+      totalDonations: true,
+      availability: true,
+      status: true,
+      createdAt: true,
+      updatedAt: true,
+      userProfile: {
+        select: {
+          id: true,
+          userId: true,
+          bio: true,
+          age: true,
+          lastDonationDate: true,
+          gender: true,
+          createdAt: true,
+          updatedAt: true,
+        },
       },
     },
-  },
-});
+  });
 
-
-  const users: SafeUser[] = usersRaw.map(user => {
-  if (user.userProfile && user.userProfile.lastDonationDate) {
-    const ld = user.userProfile.lastDonationDate;
-    return {
-      ...user,
-      userProfile: {
-        ...user.userProfile,
-        lastDonationDate:
-          typeof ld === 'string' ? new Date(ld) : ld,
-      },
-    };
-  }
-  return user;
-}) as SafeUser[];
-
+  const users: SafeUser[] = usersRaw.map((user) => {
+    if (user.userProfile && user.userProfile.lastDonationDate) {
+      const ld = user.userProfile.lastDonationDate;
+      return {
+        ...user,
+        userProfile: {
+          ...user.userProfile,
+          // lastDonationDate: typeof ld === "string" ? new Date(ld) : ld,
+        },
+      };
+    }
+    return user;
+  }) as SafeUser[];
 
   const total = await prisma.user.count({ where: whereCondition });
 
@@ -146,7 +155,7 @@ const getAllFromDB = async (
   };
 };
 
-// Get user by ID 
+// Get user by ID
 const getByIdFromDB = async (id: string): Promise<SafeUserData | null> => {
   const result = await prisma.user.findUnique({
     where: {

@@ -1,13 +1,4 @@
-// export type IUserrFilterRequest = {
-//   searchTerm?: string | undefined;
-//   email?: string | undefined;
-//   bloodType?: string | undefined;
-//   location?: string | undefined;
-//   city?: string | undefined;
-// };
-
 import { BloodGroup, Gender, User, UserRole, UserStatus } from "@prisma/client";
-
 
 export interface IUserFilterRequest {
   searchTerm?: string;
@@ -23,7 +14,7 @@ export interface IPaginationOptions {
   limit?: number;
   page?: number;
   sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
+  sortOrder?: "asc" | "desc";
 }
 
 export interface IGenericResponse<T> {
@@ -36,10 +27,7 @@ export interface IGenericResponse<T> {
 }
 
 // Define a SafeUser type excluding password and needPasswordChange
-export type SafeUser = Omit<
-  User,
-  'password' | 'needPasswordChange'
-> & {
+export type SafeUser = Omit<User, "password" | "needPasswordChange"> & {
   userProfile?: {
     id: string;
     userId: string;
@@ -63,10 +51,7 @@ export type UserProfileRaw = {
   updatedAt: Date;
 };
 
-export type UserRaw = Omit<
-  User,
-  'password' | 'needPasswordChange'
-> & {
+export type UserRaw = Omit<User, "password" | "needPasswordChange"> & {
   userProfile?: UserProfileRaw | null;
 };
 

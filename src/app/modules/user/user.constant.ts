@@ -15,17 +15,17 @@
 //   "city",
 // ]; // for all filtering
 
-
-
-export const userSearchableFields = ['name', 'email'];
+export const userSearchableFields = ["name", "email"];
 
 export const userFilterableFields = [
-  'email',
-  'bloodType',
-  'city',
-  'location',
-  'availability',
-  'gender',
-  'role',
-  'status',
+  "name",
+  "contactNumber",
+  "email",
+  "bloodType",
+  "city",
+  "location",
+  "availability",
+  "gender",
+  "role",
+  "status",
 ];
