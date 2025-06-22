@@ -3,12 +3,8 @@ import cors from "cors";
 import httpStatus from "http-status";
 import globalErrorHandler from "./app/middlewares/globalErrorHandler";
 import cookieParser from "cookie-parser";
-// import { userRoutes } from "./app/modules/user/user.routes";
-// import { AuthRoutes } from "./app/modules/Auth/auth.routes";
-// import { requestRoutes } from "./app/modules/request/request.routes";
-// import { profileRoutes } from "./app/modules/profile/profile.routes";
-// import { postRoutes } from "./app/modules/post/post.routes";
 import router from "./app/routes";
+import './cron/updateAvailability';
 
 const app: Application = express();
 
@@ -36,13 +32,10 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.use("/api", router);
-// app.use("/api", userRoutes);
-// app.use("/api", AuthRoutes);
-// app.use("/api", requestRoutes);
-// app.use("/api", profileRoutes);
-// app.use("/api", postRoutes);
 
 app.use(globalErrorHandler);
+
+
 
 app.use((req: Request, res: Response, next: NextFunction) => {
   res.status(httpStatus.NOT_FOUND).json({
