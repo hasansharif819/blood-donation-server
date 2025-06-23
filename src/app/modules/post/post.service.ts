@@ -50,7 +50,7 @@ const myDonationPosts = async (user: any) => {
 
   const posts = await prisma.post.findMany({
     where: {
-      userId: user.id
+      userId: user.id,
     },
     include: {
       user: {
@@ -67,38 +67,57 @@ const myDonationPosts = async (user: any) => {
 };
 
 // Retrieve posts created by the user
-const postsMadeByMe = async (user: any) => {
+const postsMadeByMe = async (user: any, page = 1, limit = 12) => {
   const existingUser = await prisma.user.findUnique({
     where: { id: user.userId },
   });
+
   if (!existingUser) {
     throw new ApiError(httpStatus.NOT_FOUND, "User not found");
   }
 
-  const posts = await prisma.post.findMany({
-    where: {
-      userId: user.userId,
-    },
-    include: {
-      user: {
-        select: {
-          id: true,
-          name: true,
-          email: true
+  const skip = (page - 1) * limit;
+
+  const [posts, total] = await Promise.all([
+    prisma.post.findMany({
+      where: {
+        userId: user.userId,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
         },
       },
-    },
-  });
+      skip,
+      take: limit,
+      orderBy: {
+        createdAt: "desc",
+      },
+    }),
+    prisma.post.count({
+      where: {
+        userId: user.userId,
+      },
+    }),
+  ]);
 
-  return posts;
+  return {
+    data: posts,
+    meta: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
 };
 
 // Update post status (admin or post creator)
-const updatePostStatus = async (
-  id: string,
-  user: any,
-  payload: any
-) => {
+const updatePostStatus = async (id: string, user: any, payload: any) => {
   const post = await prisma.post.findUnique({
     where: { id },
   });
@@ -107,7 +126,10 @@ const updatePostStatus = async (
   }
 
   if (user.role !== UserRole.ADMIN && user.userId !== post.userId) {
-    throw new ApiError(httpStatus.FORBIDDEN, "Unauthorized to update post status");
+    throw new ApiError(
+      httpStatus.FORBIDDEN,
+      "Unauthorized to update post status"
+    );
   }
 
   const updatedPost = await prisma.post.update({
@@ -120,7 +142,7 @@ const updatePostStatus = async (
         select: {
           id: true,
           name: true,
-          email: true
+          email: true,
         },
       },
     },
@@ -130,11 +152,7 @@ const updatePostStatus = async (
 };
 
 // Update details of a post created by the user
-const updateMyPost = async (
-  id: string,
-  user: any,
-  payload: any
-) => {
+const updateMyPost = async (id: string, user: any, payload: any) => {
   const post = await prisma.post.findUnique({
     where: { id },
   });
@@ -142,7 +160,10 @@ const updateMyPost = async (
     throw new ApiError(httpStatus.NOT_FOUND, "Post not found");
   }
   if (post.userId !== user.userId) {
-    throw new ApiError(httpStatus.FORBIDDEN, "Unauthorized to update this post");
+    throw new ApiError(
+      httpStatus.FORBIDDEN,
+      "Unauthorized to update this post"
+    );
   }
 
   const updatedPost = await prisma.post.update({
@@ -160,7 +181,7 @@ const updateMyPost = async (
         select: {
           id: true,
           name: true,
-          email: true
+          email: true,
         },
       },
     },
@@ -178,14 +199,17 @@ const deleteMyPost = async (id: string, user: any) => {
     throw new ApiError(httpStatus.NOT_FOUND, "Post not found");
   }
   if (post.userId !== user.userId) {
-    throw new ApiError(httpStatus.FORBIDDEN, "Unauthorized to delete this post");
+    throw new ApiError(
+      httpStatus.FORBIDDEN,
+      "Unauthorized to delete this post"
+    );
   }
 
   const deletedPost = await prisma.post.update({
     where: { id },
     data: {
-      isActive: false
-    }
+      isActive: false,
+    },
   });
 
   return deletedPost;

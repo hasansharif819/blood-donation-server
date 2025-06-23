@@ -34,13 +34,19 @@ const myDonationPosts = catchAsync(async (req: Request, res: Response) => {
 // Retrieve posts created by the user
 const postsMadeByMe = catchAsync(async (req: Request, res: Response) => {
   const user = req.user;
-  const result = await postServices.postsMadeByMe(user);
+
+  // Parse query parameters or use default
+  const page = parseInt(req.query.page as string) || 1;
+  const limit = parseInt(req.query.limit as string) || 12;
+
+  const result = await postServices.postsMadeByMe(user, page, limit);
 
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
     message: "Posts created by me retrieved successfully",
-    data: result,
+    data: result.data,
+    meta: result.meta,
   });
 });
 
@@ -48,9 +54,12 @@ const postsMadeByMe = catchAsync(async (req: Request, res: Response) => {
 const updatePostStatus = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
   const user = req.user;
-  // Validate request body using Zod
   const validatedData = postValidation.updatePostStatus.parse(req.body);
-  const result = await postServices.updatePostStatus(id, user, validatedData.body);
+  const result = await postServices.updatePostStatus(
+    id,
+    user,
+    validatedData.body
+  );
 
   sendResponse(res, {
     success: true,
