@@ -19,9 +19,9 @@ cron.schedule("0 0 * * *", async () => {
     const updates = users.map(async (user) => {
       const lastDonationDate = user.userProfile?.lastDonationDate;
 
-      console.log(
-        `Checking user ${user.id}... Last donation date: ${lastDonationDate}`
-      );
+      // console.log(
+      //   `Checking user ${user.id}... Last donation date: ${lastDonationDate}`
+      // );
 
       let shouldBeAvailable: boolean;
 
@@ -29,8 +29,14 @@ cron.schedule("0 0 * * *", async () => {
         // If no donation date, mark as available
         shouldBeAvailable = true;
       } else {
-        const daysSince = dayjs().diff(dayjs(lastDonationDate), "day");
-        shouldBeAvailable = daysSince >= 120;
+        const parsedDate = dayjs(lastDonationDate, "DD/MM/YYYY");
+
+        const daysDiff = dayjs().diff(parsedDate, "day");
+
+        shouldBeAvailable = daysDiff >= 120;
+
+        // const daysSince = dayjs().diff(dayjs(lastDonationDate), "day");
+        // shouldBeAvailable = daysSince >= 120;
       }
 
       // Only update if current availability is incorrect
@@ -42,14 +48,14 @@ cron.schedule("0 0 * * *", async () => {
           },
         });
 
-        console.log(
-          `✅ Updated user ${user.id}: availability → ${shouldBeAvailable}`
-        );
+        // console.log(
+        //   `✅ Updated user ${user.id}: availability → ${shouldBeAvailable}`
+        // );
       }
     });
 
     await Promise.all(updates);
-    console.log("✅ Availability update completed.");
+    // console.log("✅ Availability update completed.");
   } catch (error) {
     console.error("❌ Error during availability update:", error);
   }

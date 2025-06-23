@@ -10,6 +10,7 @@ import httpStatus from "http-status";
 import { AuthUtils } from "./auth.utils";
 import { hashedPassword } from "../../../helpers/hashedPasswordHelper";
 import emailSender from "./emailSender";
+import dayjs from "dayjs";
 
 //Create user
 const registerUser = async (data: any) => {
@@ -18,10 +19,22 @@ const registerUser = async (data: any) => {
   });
 
   if (existingUser) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'User already exists');
+    throw new ApiError(httpStatus.BAD_REQUEST, "User already exists");
   }
 
   const hashedPassword = await bcrypt.hash(data.password, 12);
+
+  let userAvailability: boolean = true;
+  const lastDonationDate = data.lastDonationDate;
+
+  if (lastDonationDate) {
+    // Parse as day/month/year
+    const parsedDate = dayjs(lastDonationDate, "DD/MM/YYYY");
+
+    const daysDiff = dayjs().diff(parsedDate, "day");
+
+    userAvailability = daysDiff >= 120;
+  }
 
   return await prisma.$transaction(async (tx) => {
     // Step 1: Create user
@@ -30,13 +43,13 @@ const registerUser = async (data: any) => {
         name: data.name,
         email: data.email,
         password: hashedPassword,
-        role: data.role || 'USER',
+        role: data.role || "USER",
         bloodType: data.bloodType,
         location: data.location,
         city: data.city,
         totalDonations: data.totalDonations ?? 0,
-        availability: data.availability ?? true,
-        status: data.status ?? 'ACTIVE',
+        availability: userAvailability,
+        status: data.status ?? "ACTIVE",
       },
     });
 
@@ -47,7 +60,7 @@ const registerUser = async (data: any) => {
         age: data.age,
         bio: data.bio,
         gender: data.gender,
-        contactNumber: data.contactNumber ?? '',
+        contactNumber: data.contactNumber ?? "",
         lastDonationDate: data.lastDonationDate,
       },
     });
