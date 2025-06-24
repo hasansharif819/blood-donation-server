@@ -18,16 +18,23 @@ const createPost = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-// Retrieve posts where the user is a donor (approved posts)
-const myDonationPosts = catchAsync(async (req: Request, res: Response) => {
-  const user = req.user;
-  const result = await postServices.myDonationPosts(user);
+const getAllPosts = catchAsync(async (req: Request, res: Response) => {
+  const { page = "1", limit = "50", ...filters } = req.query;
+
+  const pageNumber = parseInt(page as string, 10);
+  const limitNumber = parseInt(limit as string, 10);
+
+  const result = await postServices.getAllPosts(filters, {
+    page: pageNumber,
+    limit: limitNumber,
+  });
 
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
-    message: "My donation posts retrieved successfully",
-    data: result,
+    message: "Donation posts retrieved successfully",
+    data: result.data,
+    meta: result.meta,
   });
 });
 
@@ -101,7 +108,7 @@ const deleteMyPost = catchAsync(async (req: Request, res: Response) => {
 
 export const postController = {
   createPost,
-  myDonationPosts,
+  getAllPosts,
   postsMadeByMe,
   updatePostStatus,
   updateMyPost,

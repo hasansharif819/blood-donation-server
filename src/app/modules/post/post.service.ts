@@ -39,31 +39,71 @@ const createPost = async (user: any, payload: any) => {
   return post;
 };
 
-// Retrieve posts where the user is a donor (approved posts)
-const myDonationPosts = async (user: any) => {
-  const existingUser = await prisma.user.findUnique({
-    where: { id: user.userId },
-  });
-  if (!existingUser) {
-    throw new ApiError(httpStatus.NOT_FOUND, "User not found");
-  }
+const getAllPosts = async (
+  filters: any,
+  options: { page: number; limit: number }
+) => {
+  const { page, limit } = options;
+  const skip = (page - 1) * limit;
 
-  const posts = await prisma.post.findMany({
-    where: {
-      userId: user.id,
-    },
-    include: {
-      user: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
+  const {
+    bloodType,
+    numberOfBags,
+    dateOfDonation,
+    donationTime,
+    hospitalName,
+    hospitalAddress,
+    reason,
+    postStatus,
+    isManaged,
+    isActive,
+  } = filters;
+
+  const where: any = {};
+
+  if (isActive !== undefined) where.isActive = isActive === "true";
+  if (bloodType) where.bloodType = bloodType;
+  if (numberOfBags) where.numberOfBags = parseInt(numberOfBags);
+  if (dateOfDonation) where.dateOfDonation = new Date(dateOfDonation);
+  if (donationTime)
+    where.donationTime = { contains: donationTime, mode: "insensitive" };
+  if (hospitalName)
+    where.hospitalName = { contains: hospitalName, mode: "insensitive" };
+  if (hospitalAddress)
+    where.hospitalAddress = { contains: hospitalAddress, mode: "insensitive" };
+  if (reason) where.reason = { contains: reason, mode: "insensitive" };
+  if (postStatus)
+    where.postStatus = { contains: postStatus, mode: "insensitive" };
+  if (isManaged !== undefined) where.isManaged = isManaged === "true";
+
+  const [posts, total] = await Promise.all([
+    prisma.post.findMany({
+      where,
+      skip,
+      take: limit,
+      orderBy: { createdAt: "desc" },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
         },
       },
-    },
-  });
+    }),
+    prisma.post.count({ where }),
+  ]);
 
-  return posts;
+  return {
+    data: posts,
+    meta: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
 };
 
 // Retrieve posts created by the user
@@ -217,7 +257,7 @@ const deleteMyPost = async (id: string, user: any) => {
 
 export const postServices = {
   createPost,
-  myDonationPosts,
+  getAllPosts,
   postsMadeByMe,
   updatePostStatus,
   updateMyPost,
