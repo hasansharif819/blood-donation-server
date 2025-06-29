@@ -4,7 +4,6 @@ import { RequestStatus } from "@prisma/client";
 import ApiError from "../../errors/ApiError";
 
 const createRequest = async (user: any, data: any) => {
-
   const userEmail = user.email;
   const requester = await prisma.user.findUnique({
     where: {
@@ -49,8 +48,9 @@ const createRequest = async (user: any, data: any) => {
     donationTime: data.donationTime,
     hospitalName: data.hospitalName,
     hospitalAddress: data.hospitalAddress,
+    city: data.city,
     reason: data.reason,
-    isManaged: data.isManaged || false
+    isManaged: data.isManaged || false,
   };
 
   const result = await prisma.request.create({

@@ -21,6 +21,7 @@ const createPost = async (user: any, payload: any) => {
       donationTime: payload.donationTime,
       hospitalName: payload.hospitalName,
       hospitalAddress: payload.hospitalAddress,
+      city: payload.city,
       reason: payload.reason,
       isManaged: payload.isManaged ?? false,
       postStatus: payload.postStatus ?? PostStatus.PENDING,
@@ -53,6 +54,7 @@ const getAllPosts = async (
     donationTime,
     hospitalName,
     hospitalAddress,
+    city,
     reason,
     postStatus,
     isManaged,
@@ -71,6 +73,7 @@ const getAllPosts = async (
     where.hospitalName = { contains: hospitalName, mode: "insensitive" };
   if (hospitalAddress)
     where.hospitalAddress = { contains: hospitalAddress, mode: "insensitive" };
+  if (city) where.city = { contains: city, mode: "insensitive" };
   if (reason) where.reason = { contains: reason, mode: "insensitive" };
   if (postStatus)
     where.postStatus = { contains: postStatus, mode: "insensitive" };
@@ -213,6 +216,11 @@ const updateMyPost = async (id: string, user: any, payload: any) => {
       numberOfBags: payload.numberOfBags,
       hospitalName: payload.hospitalName,
       hospitalAddress: payload.hospitalAddress,
+      city: payload.city,
+      dateOfDonation: payload.dateOfDonation,
+      donationTime: payload.donationTime,
+      postStatus: payload.postStatus,
+      isActive: payload.isActive,
       reason: payload.reason,
       isManaged: payload.isManaged,
     },

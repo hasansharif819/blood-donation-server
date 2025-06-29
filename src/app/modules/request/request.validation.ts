@@ -10,9 +10,12 @@ const createRequest = z.object({
     phoneNumber: z.string({
       required_error: "Phone number is required!",
     }),
-    numberOfBags: z.number({
-      required_error: "Number of bags is required!",
-    }).int().positive(),
+    numberOfBags: z
+      .number({
+        required_error: "Number of bags is required!",
+      })
+      .int()
+      .positive(),
     bloodType: z.enum([
       BloodGroup.AB_NEGATIVE,
       BloodGroup.AB_POSITIVE,
@@ -30,13 +33,16 @@ const createRequest = z.object({
       TimeOfDay.MORNING,
       TimeOfDay.NOON,
       TimeOfDay.EVENING,
-      TimeOfDay.NIGHT
+      TimeOfDay.NIGHT,
     ]),
     hospitalName: z.string({
       required_error: "Hospital name is required!",
     }),
     hospitalAddress: z.string({
       required_error: "Hospital address is required!",
+    }),
+    city: z.string({
+      required_error: "City is required!",
     }),
     reason: z.string({
       required_error: "Reason is required!",

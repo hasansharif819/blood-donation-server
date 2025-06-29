@@ -69,6 +69,7 @@ model Request {
   donationTime       TimeOfDay
   hospitalName       String
   hospitalAddress    String
+  city               String
   reason             String
   requestStatus      RequestStatus  @default(PENDING)
   isManaged          Boolean        @default(false)
@@ -92,6 +93,7 @@ model Post {
   donationTime       TimeOfDay
   hospitalName       String
   hospitalAddress    String
+  city               String
   reason             String
   postStatus         PostStatus     @default(PENDING)
   isManaged          Boolean        @default(false)
