@@ -4,6 +4,7 @@ import { AuthRoutes } from "../modules/Auth/auth.routes";
 import { requestRoutes } from "../modules/request/request.routes";
 import { postRoutes } from "../modules/post/post.routes";
 import { profileRoutes } from "../modules/profile/profile.routes";
+import { postApprovalRoutes } from "../modules/postApproval/postApproval.routes";
 
 const router = express.Router();
 
@@ -13,8 +14,8 @@ const moduleRoutes = [
     route: AuthRoutes,
   },
   {
-      path: '/users',
-      route: userRoutes
+    path: "/users",
+    route: userRoutes,
   },
   {
     path: "/requests",
@@ -27,6 +28,10 @@ const moduleRoutes = [
   {
     path: "/profile",
     route: profileRoutes,
+  },
+  {
+    path: "/post-approvals",
+    route: postApprovalRoutes,
   },
 ];
 
