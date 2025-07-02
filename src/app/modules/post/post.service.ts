@@ -72,7 +72,10 @@ const getAllPosts = async (
   if (hospitalName)
     where.hospitalName = { contains: hospitalName, mode: "insensitive" };
   if (hospitalAddress)
-    where.hospitalAddress = { contains: hospitalAddress, mode: "insensitive" };
+    where.hospitalAddress = {
+      contains: hospitalAddress,
+      mode: "insensitive",
+    };
   if (city) where.city = { contains: city, mode: "insensitive" };
   if (reason) where.reason = { contains: reason, mode: "insensitive" };
   if (postStatus)
@@ -91,6 +94,17 @@ const getAllPosts = async (
             id: true,
             name: true,
             email: true,
+          },
+        },
+        approvals: {
+          select: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
           },
         },
       },
