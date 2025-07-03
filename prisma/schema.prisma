@@ -127,7 +127,8 @@ model Comment {
   id                 String     @id @default(uuid())
   postId             String
   userId             String
-  content            String
+  content            String?
+  image              String?
   isActive           Boolean    @default(true)
   parentId           String?    // For replies to other comments
   createdAt          DateTime   @default(now())

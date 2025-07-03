@@ -5,6 +5,7 @@ import { requestRoutes } from "../modules/request/request.routes";
 import { postRoutes } from "../modules/post/post.routes";
 import { profileRoutes } from "../modules/profile/profile.routes";
 import { postApprovalRoutes } from "../modules/postApproval/postApproval.routes";
+import { commentRoutes } from "../modules/comment/comment.routes";
 
 const router = express.Router();
 
@@ -32,6 +33,10 @@ const moduleRoutes = [
   {
     path: "/post-approvals",
     route: postApprovalRoutes,
+  },
+  {
+    path: "/comments",
+    route: commentRoutes,
   },
 ];
 
