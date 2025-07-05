@@ -8,9 +8,9 @@ import { IChangePassword } from "./auth.interface";
 import ApiError from "../../errors/ApiError";
 import httpStatus from "http-status";
 import { AuthUtils } from "./auth.utils";
-import { hashedPassword } from "../../../helpers/hashedPasswordHelper";
 import emailSender from "./emailSender";
 import dayjs from "dayjs";
+import { hashedPassword } from "../../../helpars/hashedPasswordHelper";
 
 //Create user
 const registerUser = async (data: any) => {
