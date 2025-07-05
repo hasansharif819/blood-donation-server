@@ -6,6 +6,7 @@ import { postRoutes } from "../modules/post/post.routes";
 import { profileRoutes } from "../modules/profile/profile.routes";
 import { postApprovalRoutes } from "../modules/postApproval/postApproval.routes";
 import { commentRoutes } from "../modules/comment/comment.routes";
+import { notificationRoutes } from "../modules/notification/notification.routes";
 
 const router = express.Router();
 
@@ -37,6 +38,10 @@ const moduleRoutes = [
   {
     path: "/comments",
     route: commentRoutes,
+  },
+  {
+    path: "/notifications",
+    route: notificationRoutes,
   },
 ];
 

@@ -1,6 +1,7 @@
 import httpStatus from "http-status";
 import prisma from "../../../shared/prisma";
 import ApiError from "../../errors/ApiError";
+import { dynamicCreateNotification } from "../../../utils/notificationMessageBuilder";
 
 const createComment = async (user: any, payload: any) => {
   const existingUser = await prisma.user.findUnique({
@@ -28,6 +29,25 @@ const createComment = async (user: any, payload: any) => {
       parentId: payload.parentId,
     },
   });
+
+  // Create notification for the post owner
+  await dynamicCreateNotification({
+    type: "NEW_COMMENT",
+    userId: existingPost.userId, // Post owner's userId
+    actorId: user.userId,
+    postId: payload.postId,
+  });
+
+  // If it's a reply to another comment, create a notification for the original commenter
+  if (payload.parentId) {
+    await dynamicCreateNotification({
+      type: "COMMENT_REPLY",
+      userId: comment.userId, // Commenter's userId
+      actorId: user.userId,
+      postId: payload.postId,
+      commentId: comment.id,
+    });
+  }
 
   return comment;
 };

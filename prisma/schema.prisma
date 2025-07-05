@@ -35,6 +35,8 @@ model User {
   posts              Post[]          @relation("UserPosts")
   postApprovals      PostApproval[]  @relation("UserApprovals")
   comments           Comment[]       @relation("UserComments")
+  notifications      Notification[]  @relation("UserNotifications")
+  actorNotifications Notification[]  @relation("ActorNotifications")
 
   @@index([bloodType]) // Optimize queries by blood type
   @@index([status])    // Optimize queries by user status
@@ -77,6 +79,7 @@ model Request {
   createdAt          DateTime       @default(now())
   updatedAt          DateTime       @updatedAt
   donor              User           @relation("DonatedRequests", fields: [donorId], references: [id], onDelete: Restrict)
+  notifications      Notification[] @relation("RequestNotifications")
 
   @@index([bloodType])       // Optimize queries by blood type
   @@index([requestStatus])   // Optimize queries by request status
@@ -103,6 +106,7 @@ model Post {
   user               User           @relation("UserPosts", fields: [userId], references: [id], onDelete: Cascade)
   approvals          PostApproval[] @relation("PostApprovals")
   comments           Comment[]      @relation("PostComments")
+  notifications      Notification[] @relation("PostNotifications")
 
   @@index([bloodType])    // Optimize queries by blood type
   @@index([postStatus])   // Optimize queries by post status
@@ -137,10 +141,45 @@ model Comment {
   user               User       @relation("UserComments", fields: [userId], references: [id], onDelete: Cascade)
   parent             Comment?   @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
   replies            Comment[]  @relation("CommentReplies")
+  notifications      Notification[] @relation("CommentNotifications")
 
   @@index([postId])  // Optimize queries by post
   @@map("comments")
 }
+
+model Notification {
+  id           String       @id @default(uuid())
+  type         NotificationType
+  userId       String
+  actorId      String?
+  postId       String?
+  requestId    String?
+  commentId    String?
+  message      String
+  isRead       Boolean      @default(false)
+  remindAt     DateTime?    
+  createdAt    DateTime     @default(now())
+
+  user         User         @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
+  actor        User?        @relation("ActorNotifications", fields: [actorId], references: [id], onDelete: SetNull)
+  post         Post?        @relation("PostNotifications", fields: [postId], references: [id], onDelete: Cascade)
+  request      Request?     @relation("RequestNotifications", fields: [requestId], references: [id], onDelete: Cascade)
+  comment      Comment?     @relation("CommentNotifications", fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isRead])
+  @@index([remindAt])
+  @@map("notifications")
+}
+
+enum NotificationType {
+  REQUEST_RESPONSE
+  NEW_COMMENT
+  COMMENT_REPLY
+  POST_APPROVED
+  POST_APPROVAL_REMINDER
+}
+
 
 // Enum for user status
 enum UserStatus {
