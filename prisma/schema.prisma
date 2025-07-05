@@ -37,6 +37,10 @@ model User {
   comments           Comment[]       @relation("UserComments")
   notifications      Notification[]  @relation("UserNotifications")
   actorNotifications Notification[]  @relation("ActorNotifications")
+  sentMessages       Message[]       @relation("SentMessages")
+  conversations      Participant[]   @relation("UserConversations")
+  callsMade          Call[]          @relation("CallsMade")
+  callsReceived      Call[]          @relation("CallsReceived")
 
   @@index([bloodType]) // Optimize queries by blood type
   @@index([status])    // Optimize queries by user status
@@ -171,6 +175,81 @@ model Notification {
   @@index([remindAt])
   @@map("notifications")
 }
+
+//Start Messaging / Chatting / Calling etc.
+model Conversation {
+  id           String        @id @default(uuid())
+  isGroup      Boolean       @default(false)
+  name         String?       // Group name
+  participants Participant[]
+  messages     Message[]
+  calls        Call[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Participant {
+  id              String        @id @default(uuid())
+  userId          String
+  conversationId  String
+  joinedAt        DateTime      @default(now())
+
+  user            User          @relation("UserConversations", fields: [userId], references: [id], onDelete: Cascade)
+  conversation    Conversation  @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+}
+
+model Message {
+  id              String        @id @default(uuid())
+  conversationId  String
+  senderId        String
+  content         String?
+  mediaUrl        String?
+  type            MessageType   @default(TEXT)
+  createdAt       DateTime      @default(now())
+
+  conversation    Conversation  @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender          User          @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+}
+
+model Call {
+  id             String        @id @default(uuid())
+  conversationId String
+  callerId       String
+  receiverId     String?
+
+  callType       CallType
+  startedAt      DateTime
+  endedAt        DateTime?
+  status         CallStatus    @default(MISSED)
+
+  conversation   Conversation  @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  caller         User          @relation("CallsMade", fields: [callerId], references: [id], onDelete: Cascade)
+  receiver       User?         @relation("CallsReceived", fields: [receiverId], references: [id], onDelete: SetNull)
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  VIDEO
+  AUDIO
+  FILE
+  CALL
+  SYSTEM
+}
+
+enum CallType {
+  AUDIO
+  VIDEO
+}
+
+enum CallStatus {
+  ONGOING
+  MISSED
+  COMPLETED
+}
+
+// End the Chatting, messaging, Calling etc.
 
 enum NotificationType {
   REQUEST_RESPONSE

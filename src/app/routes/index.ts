@@ -7,6 +7,7 @@ import { profileRoutes } from "../modules/profile/profile.routes";
 import { postApprovalRoutes } from "../modules/postApproval/postApproval.routes";
 import { commentRoutes } from "../modules/comment/comment.routes";
 import { notificationRoutes } from "../modules/notification/notification.routes";
+import { conversationRoutes } from "../modules/conversation/conversation.routes";
 
 const router = express.Router();
 
@@ -42,6 +43,10 @@ const moduleRoutes = [
   {
     path: "/notifications",
     route: notificationRoutes,
+  },
+  {
+    path: "/conversations",
+    route: conversationRoutes,
   },
 ];
 
