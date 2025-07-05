@@ -14,11 +14,7 @@ router.post(
   requestController.createRequest
 );
 
-router.get(
-  "/",
-  auth(UserRole.USER),
-  requestController.myDonationRequests
-);
+router.get("/", auth(UserRole.USER), requestController.myDonationRequests);
 
 //Donation Requests Made By Me
 router.get(
@@ -27,8 +23,8 @@ router.get(
   requestController.donationRequestsMadeByMe
 );
 
-router.put(
-  "/:id",
+router.patch(
+  "/update-status/:id",
   auth(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.USER),
   requestController.updateRequest
 );

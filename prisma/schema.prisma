@@ -63,7 +63,7 @@ model UserProfile {
 model Request {
   id                 String         @id @default(uuid())
   donorId            String
-  requesterId        String?
+  requesterId        String
   phoneNumber        String
   bloodType          BloodGroup
   numberOfBags       Int

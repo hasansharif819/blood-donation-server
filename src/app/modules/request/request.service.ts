@@ -2,6 +2,7 @@ import httpStatus from "http-status";
 import prisma from "../../../shared/prisma";
 import { RequestStatus } from "@prisma/client";
 import ApiError from "../../errors/ApiError";
+import { dynamicCreateNotification } from "../../../utils/notificationMessageBuilder";
 
 const createRequest = async (user: any, data: any) => {
   const userEmail = user.email;
@@ -191,12 +192,20 @@ const donationRequestsMadeByMe = async (user: any) => {
   return myRequestsForDonor;
 };
 
+//Update the Request Status
 const updateRequest = async (
   id: string,
   user: any,
   statusObject: { status: RequestStatus }
 ) => {
   const { status } = statusObject;
+
+  if (!["APPROVED", "REJECTED"].includes(status)) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      "Invalid status. Must be either 'APPROVED' or 'REJECTED'."
+    );
+  }
 
   const requestedData = await prisma.request.findUnique({
     where: {
@@ -234,6 +243,24 @@ const updateRequest = async (
       requestStatus: status,
     },
   });
+
+  if (status === "APPROVED") {
+    await dynamicCreateNotification({
+      type: "REQUEST_RESPONSE",
+      userId: requestedData.requesterId,
+      actorId: donorId,
+      requestId: id,
+      status: "APPROVED",
+    });
+  } else if (status === "REJECTED") {
+    await dynamicCreateNotification({
+      type: "REQUEST_RESPONSE",
+      userId: requestedData.requesterId,
+      actorId: donorId,
+      requestId: id,
+      status: "REJECTED",
+    });
+  }
 
   return updateRequestStatus;
 };

@@ -1,6 +1,7 @@
 import httpStatus from "http-status";
 import prisma from "../../../shared/prisma";
 import ApiError from "../../errors/ApiError";
+import { dynamicCreateNotification } from "../../../utils/notificationMessageBuilder";
 
 // Create a new blood donation post
 const createPostApproval = async (user: any, payload: any) => {
@@ -49,6 +50,22 @@ const createPostApproval = async (user: any, payload: any) => {
         },
       },
     },
+  });
+
+  if (!postapprovals) {
+    throw new ApiError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      "Post approval failed"
+    );
+  }
+
+  // Create a notification for the post approval
+  await dynamicCreateNotification({
+    type: "POST_APPROVED",
+    userId: existingPost.userId,
+    actorId: user.userId,
+    postId: payload.postId,
+    status: "APPROVED",
   });
 
   return postapprovals;
