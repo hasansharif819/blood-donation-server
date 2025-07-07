@@ -31,7 +31,13 @@ export const initSocket = (server: any) => {
               page,
               limit
             );
-          socket.emit("messagesFetched", result);
+
+          // ✅ THIS SHOULD BE AN ARRAY!
+          // Make sure result.data is an array of messages
+          socket.emit("messagesFetched", {
+            data: result.data, // <-- This should be an array
+            meta: result.meta,
+          });
         } catch (error) {
           console.error("❌ Failed to fetch messages:", error);
           socket.emit("error", "Failed to fetch messages");
