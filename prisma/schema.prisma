@@ -223,6 +223,10 @@ model Call {
   endedAt        DateTime?
   status         CallStatus    @default(MISSED)
 
+  sdpOffer       String?
+  sdpAnswer      String?
+  iceCandidates  Json?
+
   conversation   Conversation  @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 
   caller         User          @relation("CallsMade", fields: [callerId], references: [id], onDelete: Cascade)

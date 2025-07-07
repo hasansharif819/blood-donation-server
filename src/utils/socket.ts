@@ -101,12 +101,12 @@ export const initSocket = (server: any) => {
     });
 
     // 📞 Call events
-    socket.on("startCall", ({ conversationId, type }) => {
-      io.to(conversationId).emit("callIncoming", {
-        from: socket.id,
-        type,
-      });
-    });
+    // socket.on("startCall", ({ conversationId, type }) => {
+    //   io.to(conversationId).emit("callIncoming", {
+    //     from: socket.id,
+    //     type,
+    //   });
+    // });
 
     socket.on("endCall", ({ conversationId }) => {
       io.to(conversationId).emit("callEnded");
@@ -114,6 +114,25 @@ export const initSocket = (server: any) => {
 
     socket.on("disconnect", () => {
       console.log("🚫 User disconnected:", socket.id);
+    });
+
+    //////////////////////////////////////////////
+    // 📞 Call events
+    socket.on("startCall", ({ conversationId, callerId, callType }) => {
+      socket.join(conversationId);
+      io.to(conversationId).emit("incomingCall", { callerId, callType });
+    });
+
+    socket.on("sendOffer", ({ conversationId, callId, offer }) => {
+      io.to(conversationId).emit("receiveOffer", { callId, offer });
+    });
+
+    socket.on("sendAnswer", ({ conversationId, callId, answer }) => {
+      io.to(conversationId).emit("receiveAnswer", { callId, answer });
+    });
+
+    socket.on("iceCandidate", ({ conversationId, callId, candidate }) => {
+      io.to(conversationId).emit("iceCandidate", { callId, candidate });
     });
   });
 };
