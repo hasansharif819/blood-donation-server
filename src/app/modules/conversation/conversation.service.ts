@@ -117,6 +117,77 @@ const getConversationsByUserId = async (
   };
 };
 
+// Fetch a conversation by its ID, including participants and messages
+export const getConversationsByUserIdUsingSocket = async (
+  userId: string,
+  page: number = 1,
+  limit: number = 20
+) => {
+  const skip = (page - 1) * limit;
+
+  const [conversations, total] = await Promise.all([
+    prisma.conversation.findMany({
+      where: {
+        participants: {
+          some: { userId },
+        },
+      },
+      include: {
+        participants: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                profilePicture: true,
+              },
+            },
+          },
+        },
+        messages: {
+          orderBy: {
+            createdAt: "desc",
+          },
+          take: 1, // latest message
+          include: {
+            sender: {
+              select: {
+                id: true,
+                name: true,
+                profilePicture: true,
+              },
+            },
+          },
+        },
+      },
+      skip,
+      take: limit,
+      orderBy: {
+        updatedAt: "desc", // most recent conversations first
+      },
+    }),
+
+    prisma.conversation.count({
+      where: {
+        participants: {
+          some: { userId },
+        },
+      },
+    }),
+  ]);
+
+  return {
+    data: conversations,
+    meta: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+      hasMore: page * limit < total,
+    },
+  };
+};
+
 const getConversationById = async (conversationId: string) => {
   const conversation = await prisma.conversation.findUnique({
     where: { id: conversationId },

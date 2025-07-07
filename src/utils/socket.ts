@@ -1,6 +1,7 @@
 import { Server } from "socket.io";
 import prisma from "../shared/prisma";
 import { messageService } from "../app/modules/message/message.service";
+import { getConversationsByUserIdUsingSocket } from "../app/modules/conversation/conversation.service";
 
 let io: Server;
 
@@ -18,6 +19,21 @@ export const initSocket = (server: any) => {
     socket.on("joinRoom", ({ conversationId }) => {
       socket.join(conversationId);
       console.log(`📥 Joined room: ${conversationId}`);
+    });
+
+    // 📩 Fetch messages with pagination
+    socket.on("getConversations", async ({ userId, page = 1, limit = 20 }) => {
+      try {
+        const result = await getConversationsByUserIdUsingSocket(
+          userId,
+          page,
+          limit
+        );
+        socket.emit("conversationsFetched", result);
+      } catch (err) {
+        console.error("❌ Failed to fetch conversations:", err);
+        socket.emit("error", "Failed to fetch conversations");
+      }
     });
 
     // 📩 Fetch messages with pagination
