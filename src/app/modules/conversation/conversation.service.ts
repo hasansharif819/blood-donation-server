@@ -47,7 +47,77 @@ const createConversation = async (data: any) => {
   return conversation;
 };
 
-const getConversationsByUserId = async (userId: string) => {
+const getConversationsByUserId = async (
+  userId: string,
+  page: number = 1,
+  limit: number = 20
+) => {
+  const skip = (page - 1) * limit;
+
+  const [conversations, total] = await Promise.all([
+    prisma.conversation.findMany({
+      where: {
+        participants: {
+          some: { userId },
+        },
+      },
+      include: {
+        participants: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                profilePicture: true,
+              },
+            },
+          },
+        },
+        messages: {
+          orderBy: {
+            createdAt: "desc",
+          },
+          take: 1,
+          include: {
+            sender: {
+              select: {
+                id: true,
+                name: true,
+                profilePicture: true,
+              },
+            },
+          },
+        },
+      },
+      skip,
+      take: limit,
+      orderBy: {
+        updatedAt: "desc",
+      },
+    }),
+
+    prisma.conversation.count({
+      where: {
+        participants: {
+          some: { userId },
+        },
+      },
+    }),
+  ]);
+
+  return {
+    data: conversations,
+    meta: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+      hasMore: page * limit < total,
+    },
+  };
+};
+
+const getConversationsWithMessagesByUserId = async (userId: string) => {
   const conversations = await prisma.conversation.findMany({
     where: {
       participants: {
@@ -56,10 +126,26 @@ const getConversationsByUserId = async (userId: string) => {
     },
     include: {
       participants: {
-        include: { user: true },
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              profilePicture: true,
+            },
+          },
+        },
       },
       messages: {
-        include: { sender: true },
+        include: {
+          sender: {
+            select: {
+              id: true,
+              name: true,
+              profilePicture: true,
+            },
+          },
+        },
       },
     },
   });
@@ -129,4 +215,5 @@ export const conversationService = {
   getConversationById,
   addParticipantToConversation,
   removeParticipantFromConversation,
+  getConversationsWithMessagesByUserId,
 };

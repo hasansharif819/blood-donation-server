@@ -205,6 +205,7 @@ model Message {
   content         String?
   mediaUrl        String?
   type            MessageType   @default(TEXT)
+  isRead          Boolean       @default(false)
   createdAt       DateTime      @default(now())
 
   conversation    Conversation  @relation(fields: [conversationId], references: [id], onDelete: Cascade)
