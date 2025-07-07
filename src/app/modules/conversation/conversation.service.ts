@@ -117,42 +117,6 @@ const getConversationsByUserId = async (
   };
 };
 
-const getConversationsWithMessagesByUserId = async (userId: string) => {
-  const conversations = await prisma.conversation.findMany({
-    where: {
-      participants: {
-        some: { userId },
-      },
-    },
-    include: {
-      participants: {
-        include: {
-          user: {
-            select: {
-              id: true,
-              name: true,
-              profilePicture: true,
-            },
-          },
-        },
-      },
-      messages: {
-        include: {
-          sender: {
-            select: {
-              id: true,
-              name: true,
-              profilePicture: true,
-            },
-          },
-        },
-      },
-    },
-  });
-
-  return conversations;
-};
-
 const getConversationById = async (conversationId: string) => {
   const conversation = await prisma.conversation.findUnique({
     where: { id: conversationId },
@@ -215,5 +179,4 @@ export const conversationService = {
   getConversationById,
   addParticipantToConversation,
   removeParticipantFromConversation,
-  getConversationsWithMessagesByUserId,
 };
