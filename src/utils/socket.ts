@@ -62,10 +62,49 @@ export const initSocket = (server: any) => {
     );
 
     // 📨 Send a message
+    // socket.on("sendMessage", async (data) => {
+    //   try {
+    //     const { conversationId, senderId, content, messageType } = data;
+    //     console.log("📥 Incoming message:", data); // <-- ADD THIS LINE
+
+    //     if (!conversationId || !senderId || !content) {
+    //       console.error("❌ Invalid message data:", data);
+    //       return socket.emit(
+    //         "error",
+    //         "Missing conversationId, senderId, or content"
+    //       );
+    //     }
+
+    //     const saved = await prisma.message.create({
+    //       data: {
+    //         conversationId,
+    //         senderId,
+    //         content,
+    //         type: messageType || "TEXT",
+    //       },
+    //       include: {
+    //         sender: {
+    //           select: {
+    //             id: true,
+    //             name: true,
+    //             profilePicture: true,
+    //           },
+    //         },
+    //       },
+    //     });
+
+    //     io.to(conversationId).emit("receiveMessage", saved);
+    //   } catch (err) {
+    //     console.error("❌ Failed to send message:", err); // Shows the real issue
+    //     socket.emit("error", "Failed to send message");
+    //   }
+    // });
+
+    // In your socket.ts file, modify the "sendMessage" event handler
     socket.on("sendMessage", async (data) => {
       try {
         const { conversationId, senderId, content, messageType } = data;
-        console.log("📥 Incoming message:", data); // <-- ADD THIS LINE
+        console.log("📥 Incoming message:", data);
 
         if (!conversationId || !senderId || !content) {
           console.error("❌ Invalid message data:", data);
@@ -75,6 +114,7 @@ export const initSocket = (server: any) => {
           );
         }
 
+        // Create the message
         const saved = await prisma.message.create({
           data: {
             conversationId,
@@ -93,20 +133,46 @@ export const initSocket = (server: any) => {
           },
         });
 
+        // Update the conversation's updatedAt timestamp
+        const updatedConversation = await prisma.conversation.update({
+          where: { id: conversationId },
+          data: { updatedAt: new Date() },
+          include: {
+            participants: {
+              include: {
+                user: {
+                  select: {
+                    id: true,
+                    name: true,
+                    profilePicture: true,
+                  },
+                },
+              },
+            },
+            messages: {
+              orderBy: {
+                createdAt: "desc",
+              },
+              take: 1,
+            },
+          },
+        });
+
+        // Emit the new message to the conversation room
         io.to(conversationId).emit("receiveMessage", saved);
+
+        // Emit conversation update to all participants
+        updatedConversation.participants.forEach((participant) => {
+          io.emit("conversationUpdated", {
+            userId: participant.userId,
+            conversation: updatedConversation,
+          });
+        });
       } catch (err) {
-        console.error("❌ Failed to send message:", err); // Shows the real issue
+        console.error("❌ Failed to send message:", err);
         socket.emit("error", "Failed to send message");
       }
     });
-
-    // 📞 Call events
-    // socket.on("startCall", ({ conversationId, type }) => {
-    //   io.to(conversationId).emit("callIncoming", {
-    //     from: socket.id,
-    //     type,
-    //   });
-    // });
 
     socket.on("endCall", ({ conversationId }) => {
       io.to(conversationId).emit("callEnded");
