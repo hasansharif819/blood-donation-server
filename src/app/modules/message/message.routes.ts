@@ -7,8 +7,14 @@ const router = express.Router();
 
 router.get(
   "/:conversationId",
-  //   auth(UserRole.USER, UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  auth(UserRole.USER, UserRole.ADMIN, UserRole.SUPER_ADMIN),
   messageController.getMessagesByConversationId
+);
+
+router.patch(
+  "/:messageId",
+  auth(UserRole.USER, UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  messageController.updateMessage
 );
 
 export const messagesRoutes = router;

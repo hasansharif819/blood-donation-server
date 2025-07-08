@@ -19,6 +19,18 @@ const getMessagesByConversationId = catchAsync(
   }
 );
 
+const updateMessage = catchAsync(async (req: Request, res: Response) => {
+  const messageId = req.params.messageId;
+  const result = await messageService.updateMessage(messageId, req.body);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: "Message updated successfully",
+    data: result,
+  });
+});
+
 export const messageController = {
   getMessagesByConversationId,
+  updateMessage,
 };
