@@ -14,7 +14,11 @@ router.post(
   postController.createPost
 );
 
-router.get("/", auth(UserRole.USER), postController.getAllPosts);
+router.get(
+  "/",
+  // auth(UserRole.USER),
+  postController.getAllPosts
+);
 
 //Post Made By Me
 router.get(
