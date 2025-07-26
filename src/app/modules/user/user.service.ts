@@ -183,6 +183,7 @@ const getByIdFromDB = async (id: string): Promise<SafeUserData | null> => {
           bio: true,
           age: true,
           lastDonationDate: true,
+          contactNumber: true,
           gender: true,
           createdAt: true,
           updatedAt: true,
