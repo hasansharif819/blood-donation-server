@@ -6,22 +6,20 @@ import sendResponse from "../../../shared/sendResponse";
 import httpStatus from "http-status";
 import { userFilterableFields } from "./user.constant";
 
-
 const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
   const filters = pick(req.query, userFilterableFields);
-  const options = pick(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
+  const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
 
   const result = await userServices.getAllFromDB(filters, options);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Donors successfully found',
+    message: "Donors successfully found",
     meta: result.meta,
     data: result.data,
   });
 });
-
 
 const getByIdFromDB = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
@@ -30,6 +28,16 @@ const getByIdFromDB = catchAsync(async (req: Request, res: Response) => {
     statusCode: httpStatus.OK,
     success: true,
     message: "Donor retrieval successfully",
+    data: result,
+  });
+});
+
+const getTopDonors = catchAsync(async (req: Request, res: Response) => {
+  const result = await userServices.getTopDonors();
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Top Donor retrieval successfully",
     data: result,
   });
 });
@@ -63,7 +71,7 @@ const updateUserByAdmin = catchAsync(async (req: Request, res: Response) => {
 export const userController = {
   getAllFromDB,
   getByIdFromDB,
-  // createUser,
+  getTopDonors,
   deleteUserController,
   updateUserByAdmin,
 };

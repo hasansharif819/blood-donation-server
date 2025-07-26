@@ -7,15 +7,12 @@ import auth from "../../middlewares/auth";
 
 const router = express.Router();
 
+router.get("/top-donors", userController.getTopDonors);
 router.get("/", userController.getAllFromDB);
 router.get("/:id", userController.getByIdFromDB);
 
 //Delete User
-router.patch(
-  "/:id",
-  auth(UserRole.ADMIN),
-  userController.deleteUserController
-);
+router.patch("/:id", auth(UserRole.ADMIN), userController.deleteUserController);
 
 //Partially updating user by admin
 router.patch(

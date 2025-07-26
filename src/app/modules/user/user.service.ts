@@ -193,6 +193,51 @@ const getByIdFromDB = async (id: string): Promise<SafeUserData | null> => {
   return result;
 };
 
+const getTopDonors = async () => {
+  console.log(`Fetching top donors...`);
+  const result = await prisma.user.findMany({
+    where: {
+      status: UserStatus.ACTIVE,
+      totalDonations: {
+        gte: 1,
+      },
+    },
+    orderBy: {
+      totalDonations: "desc",
+    },
+    take: 12,
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      bloodType: true,
+      location: true,
+      city: true,
+      profilePicture: true,
+      totalDonations: true,
+      availability: true,
+      status: true,
+      createdAt: true,
+      updatedAt: true,
+      userProfile: {
+        select: {
+          id: true,
+          userId: true,
+          bio: true,
+          age: true,
+          lastDonationDate: true,
+          gender: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      },
+    },
+  });
+
+  return result;
+};
+
 //Delete User
 const deleteUser = async (id: string) => {
   const userData = await prisma.user.findUnique({
@@ -243,6 +288,7 @@ const updateUserByAdmin = async (id: string, data: any) => {
 export const userServices = {
   getAllFromDB,
   getByIdFromDB,
+  getTopDonors,
   deleteUser,
   updateUserByAdmin,
 };
